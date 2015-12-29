@@ -1,24 +1,3 @@
-munsters = { 
-  "Herman" => { "age" => 32, "gender" => "male" }, 
-  "Lily" => { "age" => 30, "gender" => "female" }, 
-  "Grandpa" => { "age" => 402, "gender" => "male" }, 
-  "Eddie" => { "age" => 10, "gender" => "male" },
-  "Marilyn" => { "age" => 23, "gender" => "female"}
-}
-
-munsters.each do |person, _|
-  case munsters[person]['age']
-  when 0..17
-    munsters[person]['age_group'] = 'kid'
-  when 18..64
-    munsters[person]['age_group'] = 'adult'
-  else
-    munsters[person]['age_group'] = 'senior'
-  end
-end
-
-p munsters
-
 # 1. 
 # str = 'The Flintstones Rock!'
 # space = ""
@@ -86,6 +65,41 @@ p munsters
 # end
 
 # 9. 
+
+# munsters = { 
+#   "Herman" => { "age" => 32, "gender" => "male" }, 
+#   "Lily" => { "age" => 30, "gender" => "female" }, 
+#   "Grandpa" => { "age" => 402, "gender" => "male" }, 
+#   "Eddie" => { "age" => 10, "gender" => "male" },
+#   "Marilyn" => { "age" => 23, "gender" => "female"}
+# }
+
+# # My solution 
+
+# munsters.each do |name, _ |
+#   case munsters[person]['age']
+#   when 0..17
+#     munsters[person]['age_group'] = 'kid'
+#   when 18..64
+#     munsters[person]['age_group'] = 'adult'
+#   else
+#     munsters[person]['age_group'] = 'senior'
+#   end
+# end
+
+# # Book solution
+
+# munsters.each do |name, info |
+#   case info['age']
+#   when 0..17
+#     munsters[person]['age_group'] = 'kid'
+#   when 18..64
+#     munsters[person]['age_group'] = 'adult'
+#   else
+#     munsters[person]['age_group'] = 'senior'
+#   end
+# end
+
 
 
 
