@@ -17,3 +17,16 @@
 # 6.
 # title = "Flintstone Family Members"
 # puts title.center(40)
+
+def dot_separated_ip_address?(input_string)
+  dot_separated_words = input_string.split(".")
+  if dot_separated_words.size != 4
+    return false
+  while dot_separated_words.size > 0 do
+    word = dot_separated_words.pop
+    break if !is_a_number?(word)
+  end
+  return true
+end
+
+puts dot_separated_ip_address(1.1.1.1)
