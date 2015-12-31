@@ -132,22 +132,17 @@ def board_full?(brd)
   empty_squares(brd).empty?
 end
 
-def someone_won?(brd)
-  !!detect_winner(brd)
-end
-
 def user_moves(brd)
   brd.keys.select { |mark| brd[mark] == USER_MARK }
 end
 
 def comp_moves(brd)
-  brd.keys.select { |mark| brd[mark] == USER_MARK }
+  brd.keys.select { |mark| brd[mark] == COMP_MARK }
 end
 
 def detect_winner(brd)
 
   WINNING_LINES.each do |line|
-    #binding.pry
     if (line - user_moves(brd)).empty?
       return "User"
     elsif (line - comp_moves(brd)).empty?
@@ -155,6 +150,10 @@ def detect_winner(brd)
     end
   end
   nil
+end
+
+def someone_won?(brd)
+  !!detect_winner(brd)
 end
 
 def ask_to_play_again
@@ -168,12 +167,13 @@ def ask_to_play_again
   answer
 end
 
-def display_game_outcome(brd)
+def display_game_outcome(brd, scores)
   if someone_won?(brd)
     prompt "#{detect_winner(brd)} won!"
   else
     prompt "It's a tie"
   end
+  prompt "User:#{scores[0]} Comp:#{scores[1]}"
 end
 
 def play_again?
@@ -212,23 +212,33 @@ def count_match_score(brd, scores)
   scores[1] += count_game_score(brd)[1] 
 end
 
-def game_play(brd, first_player)
+def place_piece!(brd, current_player)
+  if current_player == 'User'
+    user_makes_move!(brd)
+  elsif current_player == 'Comp'
+    computer_places_piece!(brd)
+  end
+end
+
+def alternate_player(current_player)
+  if current_player == 'User'
+    'Comp'
+  elsif current_player == 'Comp'
+    'User'
+  end
+end
+
+def game_play(brd, current_player)
   loop do
     display_board(brd)
-    if first_player == 'User'
-      user_makes_move!(brd)
-      break if board_full?(brd) || someone_won?(brd)
-      computer_places_piece!(brd)
-      break if board_full?(brd) || someone_won?(brd)
-    elsif first_player == 'Comp'
-      computer_places_piece!(brd)
-      display_board(brd)
-      break if board_full?(brd) || someone_won?(brd)
-      user_makes_move!(brd)
-      break if board_full?(brd) || someone_won?(brd)
-    end
+    place_piece!(brd, current_player)
+    display_board(brd)
+    current_player = alternate_player(current_player)
+    place_piece!(brd, current_player)
+    current_player = alternate_player(current_player)
+    break if board_full?(brd) || someone_won?(brd)
   end
-  display_board(brd)
+#  display_board(brd)
 end
 
 def run
@@ -237,10 +247,12 @@ def run
   loop do
     board = initialize_board
     display_board(board)
-    first_player = set_first_player
-    game_play(board, first_player)
+    current_player = set_first_player
+    game_play(board, current_player)
     
     count_match_score(board, player_scores)
+    display_game_outcome(board, player_scores)
+
     detect_match_winner(player_scores)
     if match_over?(player_scores)
       prompt detect_match_winner(player_scores)
