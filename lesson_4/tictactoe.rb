@@ -3,10 +3,11 @@ require 'pry'
 BLANK_MARK = ' '
 USER_MARK = 'X'
 COMP_MARK = 'O'
+PRIORITY_MOVE = 5
 
-WINNING_LINES = [[1,2,3], [1,3,5], [1,4,7], [1,5,9], [2,5,8], [3,6,9], [3,5,7], [4,5,6], [7,8,9]]
+WINNING_LINES = [[1,2,3], [1,4,7], [1,5,9], [2,5,8], [3,6,9], [3,5,7], [4,5,6], [7,8,9]]
 
-WINNING_SCORE = 2
+WINNING_SCORE = 5
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -61,18 +62,44 @@ def user_makes_move!(brd)
   end
 end
 
-def evaluate_moves(brd)
-  WINNING_LINES.each do |line|
-    remaining_moves = line - user_moves(brd)
-    if remaining_moves.size == 1
-      brd[remaining_moves] = COMP_MARK
-    
-  end
+def evaluate_offensive_moves(brd)
+  offensive_moves = []
 
+  WINNING_LINES.each do |line|
+    offensive_moves = (line - comp_moves(brd))
+    if offensive_moves.size == 1 && brd[offensive_moves[0]] == BLANK_MARK
+      return offensive_moves[0]
+    end
+  end
+  nil
+end
+
+def evaluate_defensive_moves(brd)
+  defensive_moves = []
+
+  WINNING_LINES.each do |line|
+    defensive_moves = (line - user_moves(brd))
+    if defensive_moves.size == 1 && brd[defensive_moves[0]] == BLANK_MARK
+      return defensive_moves[0]
+    end
+  end
+  nil
+end
+
+def evaluate_moves(brd)
+  if evaluate_offensive_moves(brd)
+    evaluate_offensive_moves(brd)
+  elsif evaluate_defensive_moves(brd)
+    evaluate_defensive_moves(brd)
+  elsif brd[PRIORITY_MOVE] == BLANK_MARK
+    PRIORITY_MOVE
+  else
+    empty_squares(brd).sample
+  end
+end
 
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
-  brd[square] = COMP_MARK
+  brd[evaluate_moves(brd)] = COMP_MARK
 end
 
 def board_full?(brd)
@@ -84,11 +111,11 @@ def someone_won?(brd)
 end
 
 def user_moves(brd)
-  brd.keys.select { |mark| brd[mark] == 'X'}
+  brd.keys.select { |mark| brd[mark] == USER_MARK }
 end
 
 def comp_moves(brd)
-  brd.keys.select { |mark| brd[mark] == 'O'}
+  brd.keys.select { |mark| brd[mark] == USER_MARK }
 end
 
 def detect_winner(brd)
