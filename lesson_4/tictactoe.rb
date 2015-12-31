@@ -9,6 +9,8 @@ WINNING_LINES = [[1,2,3], [1,4,7], [1,5,9], [2,5,8], [3,6,9], [3,5,7], [4,5,6], 
 
 WINNING_SCORE = 5
 
+FIRST_PLAYER = 'Choose'
+
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -46,6 +48,30 @@ end
 
 def empty_squares(brd)
   brd.keys.select{ |num| brd[num] == BLANK_MARK}
+end
+
+def set_first_player
+  if FIRST_PLAYER == 'Choose'
+    ask_for_first_player
+  elsif FIRST_PLAYER == 'Comp'
+    'Comp'
+  else
+    'User'
+  end
+end
+
+def ask_for_first_player
+  prompt 'Which player should go first?:([P]layer/[C]omputer)'
+  loop do
+    answer = gets.chomp.downcase
+    if answer.start_with?('p')
+      return 'User'
+    elsif answer.start_with?('c')
+      return 'Comp'
+    else
+      prompt 'Sorry, that was not a valid choice.'
+    end
+  end  #Incorrect input prompt here?
 end
 
 def user_makes_move!(brd)
@@ -142,6 +168,14 @@ def ask_to_play_again
   answer
 end
 
+def display_game_outcome(brd)
+  if someone_won?(brd)
+    prompt "#{detect_winner(brd)} won!"
+  else
+    prompt "It's a tie"
+  end
+end
+
 def play_again?
   if ask_to_play_again.start_with?('y')
     true
@@ -173,27 +207,35 @@ def match_over?(scores)
   !!detect_match_winner(scores)
 end
 
+def game_play(brd, first_player)
+  loop do
+    display_board(brd)
+    if first_player == 'User'
+      user_makes_move!(brd)
+      break if board_full?(brd) || someone_won?(brd)
+      computer_places_piece!(brd)
+      break if board_full?(brd) || someone_won?(brd)
+    elsif first_player == 'Comp'
+      computer_places_piece!(brd)
+      display_board(brd)
+      break if board_full?(brd) || someone_won?(brd)
+      user_makes_move!(brd)
+      break if board_full?(brd) || someone_won?(brd)
+    end
+  end
+  display_board(brd)
+end
+
 def run
-  
   player_scores = [0,0]
+
   loop do
     board = initialize_board
-    loop do
-      display_board(board)
-
-      user_makes_move!(board)
-      break if board_full?(board) || someone_won?(board)
-      
-      computer_places_piece!(board)
-      break if board_full?(board) || someone_won?(board)
-    end
     display_board(board)
-
-    if someone_won?(board)
-      prompt "#{detect_winner(board)} won!"
-    else
-      prompt "It's a tie"
-    end
+    first_player = set_first_player
+    game_play(board, first_player)
+    
+    display_game_outcome(board)
 
     player_scores[0] += count_score(board)[0]
     player_scores[1] += count_score(board)[1]
