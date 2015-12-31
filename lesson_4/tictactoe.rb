@@ -71,7 +71,7 @@ def ask_for_first_player
     else
       prompt 'Sorry, that was not a valid choice.'
     end
-  end  #Incorrect input prompt here?
+  end
 end
 
 def user_makes_move!(brd)
@@ -184,7 +184,7 @@ def play_again?
   end
 end
 
-def count_score(brd)
+def count_game_score(brd)
   user_score = 0
   comp_score = 0
   if detect_winner(brd) == "User"
@@ -205,6 +205,11 @@ end
 
 def match_over?(scores)
   !!detect_match_winner(scores)
+end
+
+def count_match_score(brd, scores)
+  scores[0] += count_game_score(brd)[0]
+  scores[1] += count_game_score(brd)[1] 
 end
 
 def game_play(brd, first_player)
@@ -235,11 +240,7 @@ def run
     first_player = set_first_player
     game_play(board, first_player)
     
-    display_game_outcome(board)
-
-    player_scores[0] += count_score(board)[0]
-    player_scores[1] += count_score(board)[1]
-
+    count_match_score(board, player_scores)
     detect_match_winner(player_scores)
     if match_over?(player_scores)
       prompt detect_match_winner(player_scores)
