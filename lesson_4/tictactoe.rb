@@ -106,7 +106,6 @@ def evaluate_moves(brd)
   if evaluate_offensive_or_defensive_moves(brd, :offense)
     evaluate_offensive_or_defensive_moves(brd, :offense)
   elsif evaluate_offensive_or_defensive_moves(brd, :defense)
-    binding.pry
     evaluate_offensive_or_defensive_moves(brd, :defense)
   elsif brd[PRIORITY_MOVE] == BLANK_MARK
     PRIORITY_MOVE
