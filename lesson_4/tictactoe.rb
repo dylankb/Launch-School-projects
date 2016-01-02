@@ -15,7 +15,7 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-def joiner(arr, punct=', ', conj='or')
+def joinor(arr, punct=', ', conj='or')
   arr[-1] = "#{conj} #{arr.last}" if arr.size > 1
   arr.join(punct)
 end
@@ -77,7 +77,7 @@ end
 def user_makes_move!(brd)
   square = ''
   loop do
-    prompt "Choose a square (#{joiner(empty_squares(brd))}):"
+    prompt "Choose a square (#{joinor(empty_squares(brd))}):"
     square = gets.chomp.to_i
     if empty_squares(brd).include?(square)
       brd[square] = USER_MARK
@@ -88,35 +88,26 @@ def user_makes_move!(brd)
   end
 end
 
-def evaluate_offensive_moves(brd)
-  offensive_moves = []
+def evaluate_offensive_or_defensive_moves(brd, move_type)
+  moves = []
 
   WINNING_LINES.each do |line|
-    offensive_moves = (line - comp_moves(brd))
-    if offensive_moves.size == 1 && brd[offensive_moves[0]] == BLANK_MARK
-      return offensive_moves[0]
-    end
-  end
-  nil
-end
-
-def evaluate_defensive_moves(brd)
-  defensive_moves = []
-
-  WINNING_LINES.each do |line|
-    defensive_moves = (line - user_moves(brd))
-    if defensive_moves.size == 1 && brd[defensive_moves[0]] == BLANK_MARK
-      return defensive_moves[0]
+    squares_to_check = comp_moves(brd) if move_type == :offense
+    squares_to_check = user_moves(brd) if move_type == :defense
+    moves = line - squares_to_check
+    if moves.size == 1 && brd[moves[0]] == BLANK_MARK
+      return moves[0]
     end
   end
   nil
 end
 
 def evaluate_moves(brd)
-  if evaluate_offensive_moves(brd)
-    evaluate_offensive_moves(brd)
-  elsif evaluate_defensive_moves(brd)
-    evaluate_defensive_moves(brd)
+  if evaluate_offensive_or_defensive_moves(brd, :offense)
+    evaluate_offensive_or_defensive_moves(brd, :offense)
+  elsif evaluate_offensive_or_defensive_moves(brd, :defense)
+    binding.pry
+    evaluate_offensive_or_defensive_moves(brd, :defense)
   elsif brd[PRIORITY_MOVE] == BLANK_MARK
     PRIORITY_MOVE
   else
@@ -177,11 +168,7 @@ def display_game_outcome(brd, scores)
 end
 
 def play_again?
-  if ask_to_play_again.start_with?('y')
-    true
-  else
-    false
-  end
+  ask_to_play_again.start_with?('y')
 end
 
 def count_game_score(brd)
@@ -228,17 +215,28 @@ def alternate_player(current_player)
   end
 end
 
+def match_results(scores)
+  if match_over = match_over?(scores)
+    prompt detect_match_winner(player_scores)
+  end
+  match_over
+end
+
+def setup_game
+  board = initialize_board
+  display_board(board)
+  current_player = set_first_player
+  [board, current_player]
+end
+
 def game_play(brd, current_player)
   loop do
     display_board(brd)
     place_piece!(brd, current_player)
     display_board(brd)
-    current_player = alternate_player(current_player)
-    place_piece!(brd, current_player)
-    current_player = alternate_player(current_player)
     break if board_full?(brd) || someone_won?(brd)
+    current_player = alternate_player(current_player)
   end
-#  display_board(brd)
 end
 
 def run
@@ -254,11 +252,7 @@ def run
     display_game_outcome(board, player_scores)
 
     detect_match_winner(player_scores)
-    if match_over?(player_scores)
-      prompt detect_match_winner(player_scores)
-      break
-    end
-    
+    break if match_results(player_scores)
     break unless play_again?
   end
   prompt 'Thanks for playing Tic-Tac-Toe!'
