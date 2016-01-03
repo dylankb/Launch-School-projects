@@ -1,3 +1,5 @@
+require 'pry'
+
 user = []
 comp = []
 FIRST_PLAYER = user
@@ -47,20 +49,38 @@ def hit_or_stay(deck, user)
   else
     prompt "User stays"
   end
+  answer
 end
 
 def sum_cards(player)
-  player.inject do |sum, face_value|
-    if face_value[1].to_i.to_s = face_value[1]
-      sum += face_value
+  face_values = player.map { |card| card[1] }
+  sum = 0
+  
+  face_values.each do |value|
+    if value == 'A'
+      sum += 11
     else
-      sum += 10
+      sum += (value.to_i == 0 ? 10 : value.to_i)
     end
   end
+    
+  face_values.select { |value| value == 'A'}.count.times do
+    break if sum <= 21
+    sum -=10
+  end
+  sum
 end
 
 
 def comp_hit_or_stay(deck, comp)
+  loop do
+    if sum_cards(comp) < 17
+      deal_card(deck, comp)
+      prompt "User drew a #{deal_card(deck, comp)}"
+    else
+      break
+    end
+  end
 end
 
 current_player = FIRST_PLAYER
@@ -72,7 +92,12 @@ deal_initial_hand(deck, user, comp)
 p user
 p comp
 
-hit_or_stay(deck, user)
+p sum_cards(user)
+loop do
+  choice = hit_or_stay(deck, user)
+  break if choice.start_with?('s') || sum_cards(user) > 21
+end
+comp_hit_or_stay(deck, comp)
 
 p user
 p comp
