@@ -1,4 +1,6 @@
 MATCH_WINS = 5
+BLACKJACK = 21
+DEALER_STAY_MIN = 17
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -88,7 +90,7 @@ def sum_cards(player)
   end
     
   face_values.select { |value| value == 'A'}.count.times do
-    break if sum <= 21
+    break if sum <= BLACKJACK
     sum -=10
   end
   sum
@@ -96,7 +98,7 @@ end
 
 def dealer_hit_or_stay(deck, dealer)
   loop do
-    break unless sum_cards(dealer) < 17
+    break unless sum_cards(dealer) < DEALER_STAY_MIN
     new_card = deal_card(deck, dealer)
     prompt "Dealer drew a #{new_card[1]}"
   end
@@ -105,7 +107,7 @@ def dealer_hit_or_stay(deck, dealer)
 end
 
 def busted?(player)
-  if sum_cards(player) > 21
+  if sum_cards(player) > BLACKJACK
     true
   end
 end
@@ -220,7 +222,7 @@ loop do
 
   loop do
     choice = hit_or_stay(deck, user)
-    break if choice.start_with?('s') || sum_cards(user) > 21
+    break if choice.start_with?('s') || sum_cards(user) > BLACKJACK
     display_hand("You", user)
   end
   dealer_hit_or_stay(deck, dealer)
