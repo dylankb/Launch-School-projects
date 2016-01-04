@@ -19,7 +19,6 @@ end
 def deal_card(deck, player)
   new_card = deck.pop
   player << new_card
-  new_card
 end
 
 def deal_initial_hand(deck, player1, player2)
@@ -40,16 +39,19 @@ def get_hit_or_stay_request
   answer
 end
 
-def hit_or_stay(deck, user)
-  answer = get_hit_or_stay_request
+def hit_or_stay(deck, user, answer)
   if answer.start_with?('h')
-    new_card = deal_card(deck, user)
-    prompt "You drew a #{new_card[1]}"
+    deal_card(deck, user)
+  end
+end
+
+def display_hit_or_stay(deck, user, answer)
+  if answer.start_with?('h')
+    prompt "You drew a #{user[-1][1]}"
     prompt "Your total is #{sum_cards(user)}"
   else
     prompt "You stay"
   end
-  answer
 end
 
 def joinand(cards)
@@ -93,11 +95,11 @@ def sum_cards(player)
   sum
 end
 
-def dealer_hit_or_stay(deck, dealer, user)
+def dealer_turn(deck, dealer, user)
   loop do
     break unless sum_cards(dealer) < DEALER_STAY_MIN && !busted?(user)
-    new_card = deal_card(deck, dealer)
-    prompt "Dealer drew a #{new_card[1]}"
+    deal_card(deck, dealer)
+    prompt "Dealer drew a #{dealer[-1][1]}"
   end
   display_hand("Dealer", dealer)
   prompt "Dealer total is #{sum_cards(dealer)}"
@@ -210,11 +212,14 @@ loop do
   display_hand("Dealer", dealer, 'initial')
 
   loop do
-    choice = hit_or_stay(deck, user)
-    break if choice.start_with?('s') || busted?(user)
+    break if busted?(user)
+    answer = get_hit_or_stay_request
+    break if answer.start_with?('s')
+    hit_or_stay(deck, user, answer)
+    display_hit_or_stay(deck, user, answer)
     display_hand("You", user)
   end
-  dealer_hit_or_stay(deck, dealer, user)
+  dealer_turn(deck, dealer, user)
 
   display_game_results(user, dealer)
   count_game_wins(user, dealer, player_scores)
