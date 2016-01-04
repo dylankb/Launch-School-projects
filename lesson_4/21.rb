@@ -112,45 +112,37 @@ def busted?(player)
   end
 end
 
-def evaluate_busts(user, dealer)
-  if busted?(user) && busted?(dealer)
-    :b_user_and_dealer
-  elsif busted?(user)
-    :b_user
-  elsif busted?(dealer)
-    :b_dealer
-  end
-end
-
-def display_busts(user, dealer)
-  result = evaluate_busts(user, dealer)
-
-  case result
-  when :b_user_and_dealer
-    prompt "You and the dealer both busted!"
-  when :b_user
-    prompt "You busted..."
-  when :b_dealer
-    prompt "The dealer busted!"
-  end
-end
-
 def evaluate_game(user, dealer)
   user_total = sum_cards(user)
   dealer_total = sum_cards(dealer)
-  if user_total == dealer_total || (busted?(user) && busted?(dealer))
-    :tie
-  elsif (user_total > dealer_total && !busted?(user)) || busted?(dealer)
+  if busted?(user)
+    :user_bust
+  elsif busted?(dealer)
+    :dealer_bust
+  elsif user_total > dealer_total
     :user
-  elsif (dealer_total > user_total && !busted?(dealer)) || busted?(user)
+  elsif dealer_total > user_total 
     :dealer
+  else
+    :tie
   end
 end
 
 def display_game_results(user, dealer)
-  prompt "It's a tie..." if evaluate_game(user, dealer) == :tie
-  prompt "You win!" if evaluate_game(user, dealer) == :user
-  prompt "Dealer wins!" if evaluate_game(user, dealer) == :dealer
+  result = evaluate_game(user, dealer)
+
+  case result
+  when :user_bust
+   prompt "You busted...The dealer wins." 
+  when :dealer_bust
+    prompt "The dealer busted. You win!"
+  when :tie
+    prompt "It's a tie..." 
+  when :user
+    prompt "You win!"
+  when :dealer 
+    prompt "Dealer wins!" 
+  end
 end
 
 def count_game_wins(user, dealer, scores)
@@ -159,6 +151,10 @@ def count_game_wins(user, dealer, scores)
   case result
   when :user
     scores[0] += 1
+  when :dealer_bust
+    scores[1] += 1
+  when :user_bust
+    scores[1] += 1
   when :dealer
     scores[1] += 1
   end
@@ -177,7 +173,7 @@ def display_match_results(scores)
 
   case outcome
   when :user
-    prompt "You wins the match!!"
+    prompt "You win the match!!"
   when :dealer
     prompt "Dealer wins the match!!"
   end
@@ -225,7 +221,6 @@ loop do
   end
   dealer_hit_or_stay(deck, dealer)
 
-  display_busts(user, dealer)
   display_game_results(user, dealer)
   count_game_wins(user, dealer, player_scores)
 
