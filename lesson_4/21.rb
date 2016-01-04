@@ -54,16 +54,8 @@ end
 
 def joinand(cards)
   cards[-1] = "and #{cards[-1]}"
-  if cards.size > 2
-    cards.join(', ')
-  else
-    cards.join(' ')
-  end
+  cards.size > 2 ? cards.join(', ') : cards.join(' ')
 end
-
-# def display_initial_hand(name, player) 
-#   face_values = player.map { |card| card[1] }
-# end
 
 def display_hand(name, player, time='play')
   face_values = player.map { |card| card[1] }
