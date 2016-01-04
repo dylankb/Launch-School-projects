@@ -1,9 +1,5 @@
 require 'pry'
 
-user = []
-comp = []
-FIRST_PLAYER = user
-
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -20,7 +16,7 @@ end
 
 def deal_card(deck, player)
   new_card = deck.pop
-  player << deck.pop
+  player << new_card            
   new_card
 end
 
@@ -31,7 +27,7 @@ def deal_initial_hand(deck, player1, player2)
   end
 end
 
-def get_hit_or_stay_request(deck)
+def get_hit_or_stay_request
   answer = nil
   prompt 'Would you like to hit or stay? (hit/stay)?'
   loop do
@@ -43,13 +39,40 @@ def get_hit_or_stay_request(deck)
 end
 
 def hit_or_stay(deck, user)
-  answer = get_hit_or_stay_request(deck)
+  answer = get_hit_or_stay_request  # Refactor for SRP?
   if answer.start_with?('h')
-    prompt "User drew a #{deal_card(deck, user)}"
+    new_card = deal_card(deck, user)
+    prompt "You drew a #{new_card[1]}"
+    prompt "Your total is #{sum_cards(user)}"
   else
-    prompt "User stays"
+    prompt "You stay"
   end
   answer
+end
+
+def joinand(cards)
+  cards[-1] = "and #{cards[-1]}"
+  if cards.size > 2
+    cards.join(', ')
+  else
+    cards.join(' ')
+  end
+end
+
+
+def display_initial_hand(name, player) 
+  face_values = player.map { |card| card[1]}
+  if name == 'You'
+    prompt "#{name}: #{joinand(face_values)}"
+  else
+    face_values[1] = '?'
+    prompt "#{name}: #{joinand(face_values)}"
+  end
+end
+
+def display_hand(name, player)
+  face_values = player.map { |card| card[1]}
+  prompt "#{name}: #{joinand(face_values)}"
 end
 
 def sum_cards(player)
@@ -71,34 +94,97 @@ def sum_cards(player)
   sum
 end
 
-
-def comp_hit_or_stay(deck, comp)
+def dealer_hit_or_stay(deck, dealer)
   loop do
-    if sum_cards(comp) < 17
-      deal_card(deck, comp)
-      prompt "User drew a #{deal_card(deck, comp)}"
-    else
-      break
-    end
+    break unless sum_cards(dealer) < 17
+    new_card = deal_card(deck, dealer)
+    prompt "Dealer drew a #{new_card[1]}"
+  end
+  display_hand("Dealer", dealer)
+  prompt "Dealer total is #{sum_cards(dealer)}"
+end
+
+def busted?(player)
+  if sum_cards(player) > 21
+    true
   end
 end
 
-current_player = FIRST_PLAYER
-
-deck = initialize_deck
-shuffle_deck(deck)
-deal_initial_hand(deck, user, comp)
-
-p user
-p comp
-
-p sum_cards(user)
-loop do
-  choice = hit_or_stay(deck, user)
-  break if choice.start_with?('s') || sum_cards(user) > 21
+def evaluate_busts(user, dealer)
+  if busted?(user) && busted?(dealer)
+    :b_user_and_dealer
+  elsif busted?(user)
+    :b_user
+  elsif busted?(dealer)
+    :b_dealer
+  end
 end
-comp_hit_or_stay(deck, comp)
 
-p user
-p comp
-puts "User cards: #{sum_cards(user)}"
+def display_busts(user, dealer)
+  result = evaluate_busts(user, dealer)
+
+  case result
+  when :b_user_and_dealer
+    prompt "You and the dealer both busted!" 
+  when :b_user
+    prompt "You busted..."
+  when :b_dealer
+    prompt "The dealer busted!"
+  end
+end
+
+def evaluate_game(user, dealer)
+  user_score = sum_cards(user)
+  dealer_score = sum_cards(dealer)
+  if user_score == dealer_score || busted?(user) && busted?(dealer)
+    :tie
+  elsif (user_score > dealer_score && !busted?(user)) || busted?(dealer)
+    :user
+  elsif (dealer_score > user_score && !busted?(comp)) || busted?(user)
+    :dealer
+  end
+end
+
+def display_results(user, dealer)
+  prompt "It's a tie..." if evaluate_game(user, dealer) == :tie
+  prompt "You win!" if evaluate_game(user, dealer) == :user
+  prompt "Dealer wins!" if evaluate_game(user, dealer) == :dealer
+end
+
+def setup_game
+  user = []
+  dealer = []
+
+  deck = initialize_deck
+  shuffle_deck(deck)
+  deal_initial_hand(deck, user, dealer)
+  [deck, user, dealer]
+end
+
+def play_again?
+  prompt "Would you like to play again?"
+  answer = gets.chomp.downcase
+  answer.start_with?('y')
+end
+
+loop do
+
+  deck, user, dealer = setup_game
+
+  display_initial_hand("You", user)
+  display_initial_hand("Dealer", dealer)
+
+  loop do
+    choice = hit_or_stay(deck, user)
+    break if choice.start_with?('s') || sum_cards(user) > 21
+    display_hand("You", user)
+  end
+  dealer_hit_or_stay(deck, dealer)
+
+  display_busts(user, dealer)
+  display_results(user, dealer) 
+
+  break unless play_again?
+end
+
+
