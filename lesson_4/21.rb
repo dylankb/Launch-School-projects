@@ -18,7 +18,7 @@ end
 
 def deal_card(deck, player)
   new_card = deck.pop
-  player << new_card            
+  player << new_card
   new_card
 end
 
@@ -34,7 +34,7 @@ def get_hit_or_stay_request
   prompt 'Would you like to hit or stay? (hit/stay)?'
   loop do
     answer = gets.chomp.downcase
-    break if answer.start_with?('h','s')
+    break if answer.start_with?('h', 's')
     prompt 'Sorry, that\'s not a valid response'
   end
   answer
@@ -63,7 +63,7 @@ end
 
 
 def display_initial_hand(name, player) 
-  face_values = player.map { |card| card[1]}
+  face_values = player.map { |card| card[1] }
   if name == 'You'
     prompt "#{name}: #{joinand(face_values)}"
   else
@@ -73,7 +73,7 @@ def display_initial_hand(name, player)
 end
 
 def display_hand(name, player)
-  face_values = player.map { |card| card[1]}
+  face_values = player.map { |card| card[1] }
   prompt "#{name}: #{joinand(face_values)}"
 end
 
@@ -88,10 +88,10 @@ def sum_cards(player)
       sum += (value.to_i == 0 ? 10 : value.to_i)
     end
   end
-    
-  face_values.select { |value| value == 'A'}.count.times do
+
+  face_values.select { |value| value == 'A' }.count.times do
     break if sum <= BLACKJACK
-    sum -=10
+    sum -= 10
   end
   sum
 end
@@ -127,7 +127,7 @@ def display_busts(user, dealer)
 
   case result
   when :b_user_and_dealer
-    prompt "You and the dealer both busted!" 
+    prompt "You and the dealer both busted!"
   when :b_user
     prompt "You busted..."
   when :b_dealer
@@ -138,7 +138,7 @@ end
 def evaluate_match(user, dealer)
   user_score = sum_cards(user)
   dealer_score = sum_cards(dealer)
-  if user_score == dealer_score || busted?(user) && busted?(dealer)
+  if user_score == dealer_score || (busted?(user) && busted?(dealer))
     :tie
   elsif (user_score > dealer_score && !busted?(user)) || busted?(dealer)
     :user
@@ -205,16 +205,15 @@ def play_again?
   prompt "Would you like to play again?"
   loop do
     answer = gets.chomp.downcase
-    break if answer.start_with?('y','n')
+    break if answer.start_with?('y', 'n')
     prompt "Sorry, that's not a valid response"
   end
   answer.start_with?('y')
 end
 
-player_scores = [0,0]
+player_scores = [0, 0]
 
 loop do
-
   deck, user, dealer = setup_game
 
   display_initial_hand("You", user)
@@ -229,10 +228,8 @@ loop do
 
   display_busts(user, dealer)
   display_game_results(user, dealer)
-  count_match_wins(user, dealer, player_scores) 
+  count_match_wins(user, dealer, player_scores)
 
   break unless !game_over?(player_scores) && play_again?
 end
 display_match_results(player_scores)
-
-
