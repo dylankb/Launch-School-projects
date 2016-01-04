@@ -1,4 +1,4 @@
-MATCH_WINS = 5
+GAME_WINS = 5
 BLACKJACK = 21
 DEALER_STAY_MIN = 17
 
@@ -135,7 +135,7 @@ def display_busts(user, dealer)
   end
 end
 
-def evaluate_match(user, dealer)
+def evaluate_game(user, dealer)
   user_total = sum_cards(user)
   dealer_total = sum_cards(dealer)
   if user_total == dealer_total || (busted?(user) && busted?(dealer))
@@ -148,13 +148,13 @@ def evaluate_match(user, dealer)
 end
 
 def display_game_results(user, dealer)
-  prompt "It's a tie..." if evaluate_match(user, dealer) == :tie
-  prompt "You win!" if evaluate_match(user, dealer) == :user
-  prompt "Dealer wins!" if evaluate_match(user, dealer) == :dealer
+  prompt "It's a tie..." if evaluate_game(user, dealer) == :tie
+  prompt "You win!" if evaluate_game(user, dealer) == :user
+  prompt "Dealer wins!" if evaluate_game(user, dealer) == :dealer
 end
 
-def count_match_wins(user, dealer, scores)
-  result = evaluate_match(user, dealer)
+def count_game_wins(user, dealer, scores)
+  result = evaluate_game(user, dealer)
 
   case result
   when :user
@@ -164,19 +164,16 @@ def count_match_wins(user, dealer, scores)
   end
 end
 
-def evaluate_game(scores)
-  outcome = nil
-
-  if scores[0] == MATCH_WINS
+def evaluate_match(scores)
+  if scores[0] == GAME_WINS
     outcome = :user
-  elsif scores[1] == MATCH_WINS
+  elsif scores[1] == GAME_WINS
     outcome = :dealer
   end
-  outcome
 end
 
 def display_match_results(scores)
-  outcome = evaluate_game(scores)
+  outcome = evaluate_match(scores)
 
   case outcome
   when :user
@@ -187,7 +184,7 @@ def display_match_results(scores)
 end
 
 def game_over?(scores)
-  !!evaluate_game(scores)
+  !!evaluate_match(scores)
 end
 
 def setup_game
@@ -228,7 +225,7 @@ loop do
 
   display_busts(user, dealer)
   display_game_results(user, dealer)
-  count_match_wins(user, dealer, player_scores)
+  count_game_wins(user, dealer, player_scores)
 
   break unless !game_over?(player_scores) && play_again?
 end
