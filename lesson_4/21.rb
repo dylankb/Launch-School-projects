@@ -211,8 +211,10 @@ end
 player_scores = [0, 0]
 
 loop do
+  system 'clear'
   deck, user, dealer = setup_game
-
+  
+  prompt "You: #{player_scores[0]} Dealer: #{player_scores[1]}"
   display_initial_hand("You", user)
   display_initial_hand("Dealer", dealer)
 
