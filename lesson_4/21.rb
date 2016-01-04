@@ -136,13 +136,13 @@ def display_busts(user, dealer)
 end
 
 def evaluate_match(user, dealer)
-  user_score = sum_cards(user)
-  dealer_score = sum_cards(dealer)
-  if user_score == dealer_score || (busted?(user) && busted?(dealer))
+  user_total = sum_cards(user)
+  dealer_total = sum_cards(dealer)
+  if user_total == dealer_total || (busted?(user) && busted?(dealer))
     :tie
-  elsif (user_score > dealer_score && !busted?(user)) || busted?(dealer)
+  elsif (user_total > dealer_total && !busted?(user)) || busted?(dealer)
     :user
-  elsif (dealer_score > user_score && !busted?(dealer)) || busted?(user)
+  elsif (dealer_total > user_total && !busted?(dealer)) || busted?(user)
     :dealer
   end
 end
@@ -221,7 +221,7 @@ loop do
 
   loop do
     choice = hit_or_stay(deck, user)
-    break if choice.start_with?('s') || sum_cards(user) > BLACKJACK
+    break if choice.start_with?('s') || busted?(user)
     display_hand("You", user)
   end
   dealer_hit_or_stay(deck, dealer)
