@@ -1,4 +1,4 @@
-require 'pry'
+MATCH_WINS = 5
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -39,7 +39,7 @@ def get_hit_or_stay_request
 end
 
 def hit_or_stay(deck, user)
-  answer = get_hit_or_stay_request  # Refactor for SRP?
+  answer = get_hit_or_stay_request
   if answer.start_with?('h')
     new_card = deal_card(deck, user)
     prompt "You drew a #{new_card[1]}"
@@ -133,22 +133,59 @@ def display_busts(user, dealer)
   end
 end
 
-def evaluate_game(user, dealer)
+def evaluate_match(user, dealer)
   user_score = sum_cards(user)
   dealer_score = sum_cards(dealer)
   if user_score == dealer_score || busted?(user) && busted?(dealer)
     :tie
   elsif (user_score > dealer_score && !busted?(user)) || busted?(dealer)
     :user
-  elsif (dealer_score > user_score && !busted?(comp)) || busted?(user)
+  elsif (dealer_score > user_score && !busted?(dealer)) || busted?(user)
     :dealer
   end
 end
 
-def display_results(user, dealer)
-  prompt "It's a tie..." if evaluate_game(user, dealer) == :tie
-  prompt "You win!" if evaluate_game(user, dealer) == :user
-  prompt "Dealer wins!" if evaluate_game(user, dealer) == :dealer
+def display_game_results(user, dealer)
+  prompt "It's a tie..." if evaluate_match(user, dealer) == :tie
+  prompt "You win!" if evaluate_match(user, dealer) == :user
+  prompt "Dealer wins!" if evaluate_match(user, dealer) == :dealer
+end
+
+def count_match_wins(user, dealer, scores)
+  result = evaluate_match(user, dealer)
+
+  case result
+  when :user
+    scores[0] += 1
+  when :dealer
+    scores[1] += 1
+  end
+end
+
+def evaluate_game(scores)
+  outcome = nil
+
+  if scores[0] == MATCH_WINS
+    outcome = :user
+  elsif scores[1] == MATCH_WINS
+    outcome = :dealer
+  end
+  outcome
+end
+
+def display_match_results(scores)
+  outcome = evaluate_game(scores)
+
+  case outcome
+  when :user
+    prompt "You wins the match!!"
+  when :dealer
+    prompt "Dealer wins the match!!"
+  end
+end
+
+def game_over?(scores)
+  !!evaluate_game(scores)
 end
 
 def setup_game
@@ -162,10 +199,17 @@ def setup_game
 end
 
 def play_again?
+  answer = ''
   prompt "Would you like to play again?"
-  answer = gets.chomp.downcase
+  loop do
+    answer = gets.chomp.downcase
+    break if answer.start_with?('y','n')
+    prompt "Sorry, that's not a valid response"
+  end
   answer.start_with?('y')
 end
+
+player_scores = [0,0]
 
 loop do
 
@@ -182,9 +226,11 @@ loop do
   dealer_hit_or_stay(deck, dealer)
 
   display_busts(user, dealer)
-  display_results(user, dealer) 
+  display_game_results(user, dealer)
+  count_match_wins(user, dealer, player_scores) 
 
-  break unless play_again?
+  break unless !game_over?(player_scores) && play_again?
 end
+display_match_results(player_scores)
 
 
