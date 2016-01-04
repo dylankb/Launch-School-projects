@@ -61,20 +61,25 @@ def joinand(cards)
   end
 end
 
+# def display_initial_hand(name, player) 
+#   face_values = player.map { |card| card[1] }
+# end
 
-def display_initial_hand(name, player) 
+def display_hand(name, player, time='play')
   face_values = player.map { |card| card[1] }
-  if name == 'You'
-    prompt "#{name}: #{joinand(face_values)}"
+  
+  if time == 'initial'
+    if name == 'You'
+      prompt "#{name}: #{joinand(face_values)}"
+    else
+      temp_face_values = face_values.clone
+      temp_face_values[1]= '?'
+      prompt "#{name}: #{joinand(temp_face_values)}"
+    end
   else
-    face_values[1] = '?'
+    face_values = player.map { |card| card[1] }
     prompt "#{name}: #{joinand(face_values)}"
   end
-end
-
-def display_hand(name, player)
-  face_values = player.map { |card| card[1] }
-  prompt "#{name}: #{joinand(face_values)}"
 end
 
 def sum_cards(player)
@@ -96,9 +101,9 @@ def sum_cards(player)
   sum
 end
 
-def dealer_hit_or_stay(deck, dealer)
+def dealer_hit_or_stay(deck, dealer, user)
   loop do
-    break unless sum_cards(dealer) < DEALER_STAY_MIN
+    break unless sum_cards(dealer) < DEALER_STAY_MIN && !busted?(user)
     new_card = deal_card(deck, dealer)
     prompt "Dealer drew a #{new_card[1]}"
   end
@@ -107,9 +112,7 @@ def dealer_hit_or_stay(deck, dealer)
 end
 
 def busted?(player)
-  if sum_cards(player) > BLACKJACK
-    true
-  end
+  sum_cards(player) > BLACKJACK
 end
 
 def evaluate_game(user, dealer)
@@ -211,15 +214,15 @@ loop do
   deck, user, dealer = setup_game
   
   prompt "You: #{player_scores[0]} Dealer: #{player_scores[1]}"
-  display_initial_hand("You", user)
-  display_initial_hand("Dealer", dealer)
+  display_hand("You", user, 'initial')
+  display_hand("Dealer", dealer, 'initial')
 
   loop do
     choice = hit_or_stay(deck, user)
     break if choice.start_with?('s') || busted?(user)
     display_hand("You", user)
   end
-  dealer_hit_or_stay(deck, dealer)
+  dealer_hit_or_stay(deck, dealer, user)
 
   display_game_results(user, dealer)
   count_game_wins(user, dealer, player_scores)
