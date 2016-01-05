@@ -17,8 +17,7 @@ def shuffle_deck(deck)
 end
 
 def deal_card(deck, player)
-  new_card = deck.pop
-  player << new_card
+  player << deck.pop
 end
 
 def deal_initial_hand(deck, player1, player2)
@@ -62,16 +61,11 @@ end
 def display_hand(name, player, time='play')
   face_values = player.map { |card| card[1] }
   
-  if time == 'initial'
-    if name == 'You'
-      prompt "#{name}: #{joinand(face_values)}"
-    else
-      temp_face_values = face_values.clone
-      temp_face_values[1]= '?'
-      prompt "#{name}: #{joinand(temp_face_values)}"
-    end
+  if time == 'initial' && name == 'Dealer'
+    temp_face_values = face_values.clones
+    temp_face_values[1]= '?'
+    prompt "#{name}: #{joinand(temp_face_values)}"
   else
-    face_values = player.map { |card| card[1] }
     prompt "#{name}: #{joinand(face_values)}"
   end
 end
@@ -185,7 +179,7 @@ def setup_game
   dealer = []
 
   deck = initialize_deck
-  shuffle_deck(deck)
+  deck.shuffle!
   deal_initial_hand(deck, user, dealer)
   [deck, user, dealer]
 end
