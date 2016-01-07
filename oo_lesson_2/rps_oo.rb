@@ -1,91 +1,60 @@
-require 'pry'
-
-# RPS
-
-# Game description
-# A player may choose rock, paper, or scissors.
-# R > S, P > R, S > P
-# The chosen moves will then be compared according to the rule above.
-# A winner will then be declared based on the comparison.
-
-# If they choose the same one it's a tie
-
-# Extract verbs/nouncs
-# Nouncs: Move/choice, rule
-# Verbs: compare, choose
-
-# Organize
-# Player 
-# - choose
-# Move
-# Rule 
-
-# - compare
-
-
-
 class Player
-  attr_accessor :move, :win
+  attr_accessor :move, :name, :win
 
-  def initialize(player_type = 'human')
-    @player_type = player_type
-    @move = nil
+  def initialize
     @win = nil
-  end
-
-  def choose
-    if human?
-      choice = nil
-      loop do 
-        puts "Please choose rock, paper, or scissors"
-        choice = gets.chomp
-        break if ['rock','paper','scissors'].include?(choice)
-        puts "Sorry, invalid choice"
-      end
-      self.move = choice
-    else
-      self.move = ['rock', 'paper', 'scissors'].sample
-    end
-  end
-
-  def human?
-    @player_type == 'human'
   end
 end
 
-WINNING_MOVES = {'rock' =>'scissors', 'paper' => 'rock', 'scissors'=>'rock' }
+class Human < Player
+  def get_name
+    puts "Welcome to Rock, Paper, Scissors."
+    puts "What's your name?"
+    n = ''
+    loop do
+      n = gets.chomp
+      break unless n.empty?
+      puts "Sorry, you must enter something here."
+    end
+    self.name = n
+  end
 
+  def choose
+    choice = nil
+    loop do 
+      puts "Please choose rock, paper, or scissors"
+      choice = gets.chomp
+      break if ['rock','paper','scissors'].include?(choice)
+      puts "Sorry, invalid choice"
+    end
+    self.move = choice
+  end
+end
 
+class Computer < Player
+
+  def get_name
+    self.name = ['C3PO', 'Wall-E', 'BB8'].sample
+  end
+
+  def choose
+    self.move = ['rock', 'paper', 'scissors'].sample
+  end
+end
 
 class RPSGame
-  attr_accessor :human, :computer
+  attr_accessor :human, :computer, :name
+
+  WINNING_MOVES = {'rock' =>'scissors', 'paper' => 'rock', 'scissors'=>'rock' }
 
   def initialize
     @human = Player.new
-    @computer = Player.new('computer')
-  end
-
-  def display_welcome_message
-    puts "Welcome to Rock, Paper, Scissors"
-  end
-
-  def display_goodbye_message
-    puts "Thanks for playing. Goodbye!"
+    @computer = Player.new
   end
 
   def display_moves
-    puts "You chose #{human.move}."
+    puts "#{self.name} chose #{human.move}."
     puts "Computer chose #{computer.move}"
-  end
-
-  def display_winner
-    if human.win
-      puts "You won!"
-    elsif computer.win
-      puts "Computer won!"
-    else
-      puts "It was a tie..."
-    end
   end
 
   def compare
@@ -96,19 +65,42 @@ class RPSGame
     end
   end
 
+  def display_winner
+    if human.win
+      puts "#{self.name} won!"
+    elsif computer.win
+      puts "Computer won!"
+    else
+      puts "It was a tie..."
+    end
+  end
+
+  def play_again?
+    puts 'Would you like to play again?'
+    answer = nil
+    loop do
+      answer = gets.chomp.downcase
+      break if answer.start_with?('y','n')
+      puts "Sorry, that was an invalid response. Choose y or n."
+    end
+    answer.start_with?('y')
+  end
+
+  def display_goodbye_message
+    puts "Thanks for playing. Goodbye!"
+  end
+
   def play
-    display_welcome_message
-    human.choose
-    computer.choose
-    compare
-    display_moves
-    display_winner
+    loop do
+      human.choose
+      computer.choose
+      compare
+      display_moves
+      display_winner
+      break unless play_again?
+    end
     display_goodbye_message
   end
 end
 
 RPSGame.new.play
-
-
-
-
