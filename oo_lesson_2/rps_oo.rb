@@ -1,8 +1,10 @@
+require 'pry'
+
 class Player
   attr_accessor :move, :name, :win
 
   def initialize
-    @win = nil
+    get_name
   end
 end
 
@@ -43,18 +45,19 @@ class Computer < Player
 end
 
 class RPSGame
-  attr_accessor :human, :computer, :name
+  attr_accessor :human, :computer
 
   WINNING_MOVES = {'rock' =>'scissors', 'paper' => 'rock', 'scissors'=>'rock' }
 
   def initialize
-    @human = Player.new
-    @computer = Player.new
+    @human = Human.new
+    @computer = Computer.new
   end
 
   def display_moves
-    puts "#{self.name} chose #{human.move}."
-    puts "Computer chose #{computer.move}"
+    #binding.pry
+    puts "#{human.name} chose #{human.move}."
+    puts "#{computer.name} chose #{computer.move}"
   end
 
   def compare
@@ -67,9 +70,9 @@ class RPSGame
 
   def display_winner
     if human.win
-      puts "#{self.name} won!"
+      puts "#{human.name} won!"
     elsif computer.win
-      puts "Computer won!"
+      puts "#{computer.name} won!"
     else
       puts "It was a tie..."
     end
