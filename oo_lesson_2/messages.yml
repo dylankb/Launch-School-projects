@@ -7,7 +7,8 @@ explanation: "No problem, let me explain. It's the same rules as Rock-Paper-Scis
             => Spock smashes Scissors
             Sound ok? (y/n)"
 game_start: "Cool! Let's start then."
-name?: "What's your name"
+name: "What's your name"
+check_name: "Sorry, you must enter something here."
 hand_choice: "Choose rock, paper, scissors, spock, lizard (r, p, sc, l, sp): "
 confirm_choice: "Hmm, are you sure you typed in either a r, p, sc, l, or sp?"
 wrong_y-n_response: "Hmm, enter either a y/n response."

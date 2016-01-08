@@ -2,12 +2,6 @@ require 'yaml'
 
 MESSAGES = YAML.load_file('messages.yml')
 
-module Sayable
-  def say(msg)
-    puts "=> #{msg}"
-  end
-end
-
 class Player
   attr_accessor :move, :name, :wins, :won_game
 
@@ -15,10 +9,14 @@ class Player
     get_name
     @wins = 0
   end
+
+  def say(msg)
+    puts "=> #{msg}"
+  end
+
 end
 
 class Human < Player
-  include Sayable
   def game_intro
     say MESSAGES['intro_question']
     loop do
@@ -35,12 +33,12 @@ class Human < Player
   end
 
   def get_name
-    say MESSAGES['name?']
+    say MESSAGES['name']
     n = ''
     loop do
       n = gets.chomp
       break unless n.empty?
-      puts "Sorry, you must enter something here."
+      say MESSAGES['check_name']
     end
     self.name = n
   end
@@ -69,7 +67,6 @@ class Computer < Player
 end
 
 class RPSGame
-  include Sayable
   attr_accessor :human, :computer
 
   MOVES = {'r'=>'rock', 'p'=>'paper', 'sc'=>'scissors' ,'l'=>'lizard', 'sp'=>'spock'}
@@ -81,6 +78,10 @@ class RPSGame
   def initialize
     @human = Human.new
     @computer = Computer.new
+  end
+
+  def say(msg)
+    puts "=> #{msg}"
   end
 
   def evaluate_game_winner
