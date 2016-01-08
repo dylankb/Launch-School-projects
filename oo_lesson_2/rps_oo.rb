@@ -1,17 +1,42 @@
 require 'pry'
+require 'yaml'
+
+MESSAGES = YAML.load_file('messages.yml')
+
+module Sayable
+  def say(msg)
+    puts "=> #{msg}"
+  end
+end
 
 class Player
-  attr_accessor :move, :name, :win
+  attr_accessor :move, :name, :wins, :won_game
 
   def initialize
     get_name
+    @wins = 0
   end
 end
 
 class Human < Player
+  include Sayable
+  def game_intro
+    say MESSAGES['intro_question']
+    loop do
+      answer = gets.chomp.downcase
+      if answer == 'y'
+        say MESSAGES['game_start']
+        break
+      elsif answer == 'n'
+        say MESSAGES['explanation']
+      else
+        say MESSAGES['wrong_y-n_response']
+      end
+    end
+  end
+
   def get_name
-    puts "Welcome to Rock, Paper, Scissors."
-    puts "What's your name?"
+    say MESSAGES['name?']
     n = ''
     loop do
       n = gets.chomp
@@ -23,11 +48,12 @@ class Human < Player
 
   def choose
     choice = nil
-    loop do 
-      puts "Please choose rock, paper, or scissors"
+    loop do
+      #binding.pry 
+      say MESSAGES['hand_choice']
       choice = gets.chomp
-      break if ['rock','paper','scissors'].include?(choice)
-      puts "Sorry, invalid choice"
+      break if RPSGame::MOVES.keys.include?(choice)
+      say MESSAGES['confirm_choice']
     end
     self.move = choice
   end
@@ -40,57 +66,72 @@ class Computer < Player
   end
 
   def choose
-    self.move = ['rock', 'paper', 'scissors'].sample
+    self.move = RPSGame::MOVES.keys.sample
   end
 end
 
 class RPSGame
+  include Sayable
   attr_accessor :human, :computer
 
-  WINNING_MOVES = {'rock' =>'scissors', 'paper' => 'rock', 'scissors'=>'rock' }
+  MOVES = {'r'=>'rock', 'p'=>'paper', 'sc'=>'scissors' ,'l'=>'lizard', 'sp'=>'spock'}
+  WINS = {'r' => ['sc', 'l'],'sc' => ['p', 'l'], 
+          'p' => ['r', 'sp'], 'l' => ['p', 'sp'], 
+          'sp' => ['r', 'sc']}
 
   def initialize
     @human = Human.new
     @computer = Computer.new
   end
 
-  def display_moves
-    #binding.pry
-    puts "#{human.name} chose #{human.move}."
-    puts "#{computer.name} chose #{computer.move}"
+  def compare
+    if WINS.values_at(human.move).flatten.include?(computer.move)
+      human.won_game = true
+      human.wins += 1
+    elsif WINS.values_at(computer.move).flatten.include?(human.move)
+      computer.won_game = true
+      computer.wins += 1
+    end
   end
 
-  def compare
-    if WINNING_MOVES[human.move] == computer.move
-      human.win = true
-    elsif WINNING_MOVES[computer.move] == human.move
-      computer.win = true
+  def display_moves
+    if human.won_game
+      say "#{human.name} wisely chose #{human.move}."
+    else
+      say "#{human.name} chose #{human.move}."
+    end
+    if computer.won_game
+      say "#{computer.name} wisely chose #{computer.move}"
+    elsif human.move == computer.move
+      say "#{computer.name} also chose #{computer.move}"
+    else
+      say "#{computer.name} chose #{computer.move}"
     end
   end
 
   def display_winner
-    if human.win
-      puts "#{human.name} won!"
-    elsif computer.win
-      puts "#{computer.name} won!"
+    if human.won_game
+      say "#{human.name} won!"
+    elsif computer.won_game
+      say "#{computer.name} won!"
     else
-      puts "It was a tie..."
+      say MESSAGES['tie']
     end
   end
 
   def play_again?
-    puts 'Would you like to play again?'
+    say MESSAGES['ask_play_again']
     answer = nil
     loop do
       answer = gets.chomp.downcase
       break if answer.start_with?('y','n')
-      puts "Sorry, that was an invalid response. Choose y or n."
+      say MESSAGES['wrong_y-n_response']
     end
     answer.start_with?('y')
   end
 
   def display_goodbye_message
-    puts "Thanks for playing. Goodbye!"
+    say MESSAGES['goodbye']
   end
 
   def play
