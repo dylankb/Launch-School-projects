@@ -1,4 +1,3 @@
-require 'pry'
 require 'yaml'
 
 MESSAGES = YAML.load_file('messages.yml')
@@ -48,8 +47,7 @@ class Human < Player
 
   def choose
     choice = nil
-    loop do
-      #binding.pry 
+    loop do 
       say MESSAGES['hand_choice']
       choice = gets.chomp
       break if RPSGame::MOVES.keys.include?(choice)
@@ -75,20 +73,21 @@ class RPSGame
   attr_accessor :human, :computer
 
   MOVES = {'r'=>'rock', 'p'=>'paper', 'sc'=>'scissors' ,'l'=>'lizard', 'sp'=>'spock'}
-  WINS = {'r' => ['sc', 'l'],'sc' => ['p', 'l'], 
+  WIN_MOVE = {'r' => ['sc', 'l'],'sc' => ['p', 'l'], 
           'p' => ['r', 'sp'], 'l' => ['p', 'sp'], 
           'sp' => ['r', 'sc']}
+  GAMES_TO_WIN = 3
 
   def initialize
     @human = Human.new
     @computer = Computer.new
   end
 
-  def compare
-    if WINS.values_at(human.move).flatten.include?(computer.move)
+  def evaluate_game_winner
+    if WIN_MOVE.values_at(human.move).flatten.include?(computer.move)
       human.won_game = true
       human.wins += 1
-    elsif WINS.values_at(computer.move).flatten.include?(human.move)
+    elsif WIN_MOVE.values_at(computer.move).flatten.include?(human.move)
       computer.won_game = true
       computer.wins += 1
     end
@@ -96,16 +95,16 @@ class RPSGame
 
   def display_moves
     if human.won_game
-      say "#{human.name} wisely chose #{human.move}."
+      say "#{human.name} wisely chose #{MOVES[human.move]}."
     else
-      say "#{human.name} chose #{human.move}."
+      say "#{human.name} chose #{MOVES[human.move]}."
     end
     if computer.won_game
-      say "#{computer.name} wisely chose #{computer.move}"
+      say "#{computer.name} wisely chose #{MOVES[computer.move]}"
     elsif human.move == computer.move
-      say "#{computer.name} also chose #{computer.move}"
+      say "#{computer.name} also chose #{MOVES[computer.move]}"
     else
-      say "#{computer.name} chose #{computer.move}"
+      say "#{computer.name} chose #{MOVES[computer.move]}"
     end
   end
 
@@ -130,6 +129,22 @@ class RPSGame
     answer.start_with?('y')
   end
 
+  def evaluate_match_winner
+    if human.wins == GAMES_TO_WIN
+      "#{human.name} won the match!!"
+    elsif computer.wins == GAMES_TO_WIN
+      "#{computer.name} won the match!!"
+    end
+  end
+
+  def match_over?
+    !!evaluate_match_winner
+  end
+
+  def display_match_winner
+    say evaluate_match_winner
+  end
+
   def display_goodbye_message
     say MESSAGES['goodbye']
   end
@@ -138,9 +153,13 @@ class RPSGame
     loop do
       human.choose
       computer.choose
-      compare
+      evaluate_game_winner
       display_moves
       display_winner
+      if match_over?
+        display_match_winner
+        break
+      end
       break unless play_again?
     end
     display_goodbye_message
