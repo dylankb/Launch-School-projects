@@ -2,35 +2,23 @@ require 'yaml'
 
 MESSAGES = YAML.load_file('messages.yml')
 
-class Player
-  attr_accessor :move, :name, :wins, :won_game
-
-  def initialize
-    get_name
-    @wins = 0
-  end
-
+module Sayable
   def say(msg)
     puts "=> #{msg}"
   end
+end 
 
+class Player
+  include Sayable
+  attr_accessor :move, :name, :wins, :won_game
+
+  def initialize
+    @wins = 0
+    get_name
+  end
 end
 
 class Human < Player
-  def game_intro
-    say MESSAGES['intro_question']
-    loop do
-      answer = gets.chomp.downcase
-      if answer == 'y'
-        say MESSAGES['game_start']
-        break
-      elsif answer == 'n'
-        say MESSAGES['explanation']
-      else
-        say MESSAGES['wrong_y-n_response']
-      end
-    end
-  end
 
   def get_name
     say MESSAGES['name']
@@ -67,6 +55,7 @@ class Computer < Player
 end
 
 class RPSGame
+  include Sayable
   attr_accessor :human, :computer
 
   MOVES = {'r'=>'rock', 'p'=>'paper', 'sc'=>'scissors' ,'l'=>'lizard', 'sp'=>'spock'}
@@ -82,6 +71,25 @@ class RPSGame
 
   def say(msg)
     puts "=> #{msg}"
+  end
+
+  def game_intro
+    say MESSAGES['intro_question']
+    loop do
+      answer = gets.chomp.downcase
+      if answer == 'y'
+        say MESSAGES['game_start']
+        break
+      elsif answer == 'n'
+        say MESSAGES['explanation']
+      else
+        say MESSAGES['wrong_y-n_response']
+      end
+    end
+  end
+
+  def display_games_won
+    say "#{human.name}: #{human.wins} | #{computer.name}: #{computer.wins}"
   end
 
   def evaluate_game_winner
@@ -119,6 +127,11 @@ class RPSGame
     end
   end
 
+  def reset_won_game
+    human.won_game = nil
+    computer.won_game = nil
+  end
+
   def play_again?
     say MESSAGES['ask_play_again']
     answer = nil
@@ -151,7 +164,9 @@ class RPSGame
   end
 
   def play
+    game_intro
     loop do
+      display_games_won
       human.choose
       computer.choose
       evaluate_game_winner
@@ -161,6 +176,7 @@ class RPSGame
         display_match_winner
         break
       end
+      reset_won_game
       break unless play_again?
     end
     display_goodbye_message
