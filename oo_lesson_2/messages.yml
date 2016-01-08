@@ -1,0 +1,18 @@
+intro_question: "Have you ever played Rock-Paper-Scissors-Spock-Lizard before? (y/n)"
+explanation: "No problem, let me explain. It's the same rules as Rock-Paper-Scissors except...:\n
+            => Rock crushes Lizard\n
+            => Paper disproves Spock\n
+            => Scissors decapitates Lizard\n
+            => Spock vaporizes Rock\n
+            => Spock smashes Scissors
+            Sound ok? (y/n)"
+game_start: "Cool! Let's start then."
+name?: "What's your name"
+hand_choice: "Choose rock, paper, scissors, spock, lizard (r, p, sc, l, sp): "
+confirm_choice: "Hmm, are you sure you typed in either a r, p, sc, l, or sp?"
+wrong_y-n_response: "Hmm, enter either a y/n response."
+ask_play_again: "Do you want to play again? (Y/N)?: "
+user_win: "User wins the match!"
+comp_win: "Computer wins the match!"
+tie: "It was a tie"
+goodbye: "Thanks for playing. Goodbye!"
