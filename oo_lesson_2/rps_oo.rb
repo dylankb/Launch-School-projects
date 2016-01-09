@@ -8,6 +8,31 @@ module Sayable
   end
 end 
 
+module Deduceable
+  attr_accessor :move_history
+  def record_move(player, move)
+    move_history[player.class.to_s] ||= []
+    move_history[player.class.to_s] << player.move
+  end
+
+  def find_common_move(other_player)
+    move_counts = []
+    move_history[other_player.class.to_s].each do |m|
+      move_counts << move_history[other_player.class.to_s].count(m)
+    end
+    move_counts.sort!
+    high_count = move_counts[-1]
+    move_index = move_counts.index(high_count)
+    move_history[other_player.class.to_s][move_index]
+  end
+
+  def find_common_countermove
+    common_move = find_common_move(human)
+    counter_moves_hsh = RPSGame::WIN_MOVE.select { |k,v| v.include?(common_move) }
+    counter_moves = counter_moves_hsh.keys
+  end
+end
+
 class Player
   include Sayable
   attr_accessor :move, :name, :wins, :won_game
@@ -33,25 +58,23 @@ class Human < Player
     loop do 
       say MESSAGES['hand_choice']
       self.move = gets.chomp
-      break if RPSGame::MOVES.keys.include?(choice)
+      break if RPSGame::MOVES.keys.include?(move)
       say MESSAGES['confirm_choice']
     end
   end
 end
 
 class Computer < Player
+  include Deduceable
 
   def get_name
     self.name = ['C3PO', 'Wall-E', 'BB8'].sample
-  end
-
-  def choose
-    self.move = RPSGame::MOVES.keys.sample
   end
 end
 
 class RPSGame
   include Sayable
+  include Deduceable
   attr_accessor :human, :computer
 
   MOVES = {'r'=>'rock', 'p'=>'paper', 'sc'=>'scissors' ,'l'=>'lizard', 'sp'=>'spock'}
@@ -63,6 +86,7 @@ class RPSGame
   def initialize
     @human = Human.new
     @computer = Computer.new
+    self.move_history = {}
   end
 
   def game_intro
@@ -77,6 +101,14 @@ class RPSGame
       else
         say MESSAGES['wrong_y-n_response']
       end
+    end
+  end
+
+  def choose(other_player)
+    if !move_history.empty?
+      computer.move = find_common_countermove.sample
+    else
+      computer.move = RPSGame::MOVES.keys.sample
     end
   end
 
@@ -160,7 +192,9 @@ class RPSGame
     loop do
       display_games_won
       human.choose
-      computer.choose
+      choose(human)
+      record_move(human, human.move)
+      record_move(human, computer.move)
       evaluate_game_winner
       display_moves
       display_winner
