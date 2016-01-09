@@ -22,24 +22,20 @@ class Human < Player
 
   def get_name
     say MESSAGES['name']
-    n = ''
     loop do
-      n = gets.chomp
-      break unless n.empty?
+      self.name = gets.chomp
+      break unless name.empty?
       say MESSAGES['check_name']
     end
-    self.name = n
   end
 
   def choose
-    choice = nil
     loop do 
       say MESSAGES['hand_choice']
-      choice = gets.chomp
+      self.move = gets.chomp
       break if RPSGame::MOVES.keys.include?(choice)
       say MESSAGES['confirm_choice']
     end
-    self.move = choice
   end
 end
 
@@ -69,10 +65,6 @@ class RPSGame
     @computer = Computer.new
   end
 
-  def say(msg)
-    puts "=> #{msg}"
-  end
-
   def game_intro
     say MESSAGES['intro_question']
     loop do
@@ -93,10 +85,10 @@ class RPSGame
   end
 
   def evaluate_game_winner
-    if WIN_MOVE.values_at(human.move).flatten.include?(computer.move)
+    if WIN_MOVE[human.move].include?(computer.move)
       human.won_game = true
       human.wins += 1
-    elsif WIN_MOVE.values_at(computer.move).flatten.include?(human.move)
+    elsif WIN_MOVE[computer.move].include?(human.move)
       computer.won_game = true
       computer.wins += 1
     end
