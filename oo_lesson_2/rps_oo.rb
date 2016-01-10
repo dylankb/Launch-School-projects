@@ -6,7 +6,7 @@ module Sayable
   def say(msg)
     puts "=> #{msg}"
   end
-end 
+end
 
 module Deduceable
   attr_accessor :move_history
@@ -15,7 +15,7 @@ module Deduceable
     move_history[player.class.to_s] << player.move
   end
 
-  def find_common_move(other_player)
+  def find_common_move(other_player, move_history)
     move_counts = []
     move_history[other_player.class.to_s].each do |m|
       move_counts << move_history[other_player.class.to_s].count(m)
@@ -26,8 +26,8 @@ module Deduceable
     move_history[other_player.class.to_s][move_index]
   end
 
-  def find_common_countermove
-    common_move = find_common_move(human)
+  def find_common_countermove(other_player, move_history)
+    common_move = find_common_move(other_player, move_history)
     counter_moves_hsh = RPSGame::WIN_MOVE.select { |k,v| v.include?(common_move) }
     counter_moves = counter_moves_hsh.keys
   end
@@ -70,6 +70,14 @@ class Computer < Player
   def get_name
     self.name = ['C3PO', 'Wall-E', 'BB8'].sample
   end
+  
+  def choose(other_player, move_history)
+    if !move_history.empty?
+      self.move = find_common_countermove(other_player, move_history).sample
+    else
+      self.move = RPSGame::MOVES.keys.sample
+    end
+  end
 end
 
 class RPSGame
@@ -78,8 +86,8 @@ class RPSGame
   attr_accessor :human, :computer
 
   MOVES = {'r'=>'rock', 'p'=>'paper', 'sc'=>'scissors' ,'l'=>'lizard', 'sp'=>'spock'}
-  WIN_MOVE = {'r' => ['sc', 'l'],'sc' => ['p', 'l'], 
-          'p' => ['r', 'sp'], 'l' => ['p', 'sp'], 
+  WIN_MOVE = {'r' => ['sc', 'l'],'sc' => ['p', 'l'],
+          'p' => ['r', 'sp'], 'l' => ['p', 'sp'],
           'sp' => ['r', 'sc']}
   GAMES_TO_WIN = 3
 
@@ -192,9 +200,9 @@ class RPSGame
     loop do
       display_games_won
       human.choose
-      choose(human)
+      computer.choose(human, move_history)
       record_move(human, human.move)
-      record_move(human, computer.move)
+      record_move(computer, computer.move)
       evaluate_game_winner
       display_moves
       display_winner
