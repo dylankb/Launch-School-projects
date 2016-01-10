@@ -112,14 +112,6 @@ class RPSGame
     end
   end
 
-  def choose(other_player)
-    if !move_history.empty?
-      computer.move = find_common_countermove.sample
-    else
-      computer.move = RPSGame::MOVES.keys.sample
-    end
-  end
-
   def display_games_won
     say "#{human.name}: #{human.wins} | #{computer.name}: #{computer.wins}"
   end
