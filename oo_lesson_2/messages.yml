@@ -2,9 +2,11 @@ intro_question: "Have you ever played Rock-Paper-Scissors-Spock-Lizard before? (
 explanation: "No problem, let me explain. It's the same rules as Rock-Paper-Scissors except...:\n
             => Rock crushes Lizard\n
             => Paper disproves Spock\n
+            => Lizard poisons Spock\n
             => Scissors decapitates Lizard\n
+            => Lizard eats paper
             => Spock vaporizes Rock\n
-            => Spock smashes Scissors
+            => Spock smashes Scissors\n
             Sound ok? (y/n)"
 game_start: "Cool! Let's start then."
 name: "What's your name"
