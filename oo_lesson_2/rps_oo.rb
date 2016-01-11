@@ -1,4 +1,5 @@
 require 'yaml'
+require 'pry'
 
 MESSAGES = YAML.load_file('messages.yml')
 
@@ -9,11 +10,7 @@ module Sayable
 end
 
 module Deduceable
-  attr_accessor :move_history
-  def record_move(player, move)
-    move_history[player.class.to_s] ||= []
-    move_history[player.class.to_s] << player.move
-  end
+  attr_reader :move_history
 
   def find_common_move(other_player, move_history)
     move_counts = []
@@ -23,7 +20,7 @@ module Deduceable
     move_counts.sort!
     high_count = move_counts[-1]
     move_index = move_counts.index(high_count)
-    move_history[other_player.class.to_s][move_index]
+    return move_history[other_player.class.to_s][move_index]
   end
 
   def find_common_countermove(other_player, move_history)
@@ -83,7 +80,7 @@ end
 class RPSGame
   include Sayable
   include Deduceable
-  attr_accessor :human, :computer
+  attr_accessor :human, :computer, :move_history
 
   MOVES = {'r'=>'rock', 'p'=>'paper', 'sc'=>'scissors' ,'l'=>'lizard', 'sp'=>'spock'}
   WIN_MOVE = {'r' => ['sc', 'l'],'sc' => ['p', 'l'],
@@ -110,6 +107,11 @@ class RPSGame
         say MESSAGES['wrong_y-n_response']
       end
     end
+  end
+
+  def record_move(player, move)
+    move_history[player.class.to_s] ||= []
+    move_history[player.class.to_s] << player.move
   end
 
   def display_games_won
