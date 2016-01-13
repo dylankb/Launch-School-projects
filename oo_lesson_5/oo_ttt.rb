@@ -175,8 +175,6 @@ class Game
   # end
 
   def winning_marker
-    #player_marks = {'O'=>[1,2]},{'X'=>[4,5,6]}
-    #WIN_LINES = [[1,2,3],[4,5,6],[7,8,9],[1,4,7],[2,5,8],[3,6,9],[1,5,9],[3,5,7]]
     player_marks = board.find_marks
     player_marks.each do |mark, marks|
       WIN_LINES.each do |line|
@@ -184,22 +182,9 @@ class Game
           return mark.to_sym
         end
       end
-      nil
     end
+    nil
   end
-
-  # def winning_marker
-    # human_moves = board.find_human_moves
-    # comp_moves = board.find_computer_moves
-  #   WIN_LINES.each do |line|
-  #     if (line - human_moves).empty?
-  #       return :X
-  #     elsif (line - comp_moves).empty?
-  #       return :O
-  #     end
-  #   end
-  #   nil
-  # end
 
   def winner?
     !!winning_marker
