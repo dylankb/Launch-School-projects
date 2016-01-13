@@ -13,18 +13,41 @@ require 'pry'
 # Game
 
 class Board
-  INITIAL_MARKER = ' '
+  attr_reader :squares
+  BLANK_MARK = ' '
 
   def initialize
     @squares = {}
-    (1..9).each {|key| @squares[key] = Square.new(INITIAL_MARKER)}
+    reset
+  end
+  
+  def draw
+    clear
+    puts ""
+    puts "     |     |"
+    puts "  #{squares[1]}  |  #{squares[2]}  |  #{squares[3]}"
+    puts "     |     |"
+    puts "-----+-----+----"
+    puts "     |     |"
+    puts "  #{squares[4]}  |  #{squares[5]}  |  #{squares[6]}"
+    puts "     |     |"
+    puts "-----+-----+----"
+    puts "     |     |"
+    puts "  #{squares[7]}  |  #{squares[8]}  |  #{squares[9]}"
+    puts "     |     |"
+    puts ""
   end
 
-  def get_square_at(key)
-    @squares[key]
+  def clear
+    system 'clear' or system 'cls'
   end
 
-  def set_square_at(key, marker)
+  def clear_screen_and_display_board
+    clear
+    draw
+  end
+
+  def []=(key, marker)
     @squares[key].marker = marker
   end
 
@@ -45,7 +68,11 @@ class Board
   def find_computer_moves
     computer_squares = @squares.select { |key, info| info.marker == 'O' }
     computer_squares.keys
-  end    
+  end
+
+  def reset
+    (1..9).each {|key| @squares[key] = Square.new(BLANK_MARK)}
+  end     
 end
 
 class Square
@@ -65,9 +92,6 @@ class Player
   def initialize(marker)
     @marker = marker
   end
-
-  def move
-  end
 end
 
 
@@ -78,7 +102,6 @@ class Game
   PRIORITY_MOVE = 5
 
   attr_reader :board, :human, :computer
-  #attr_writer :human_moves
 
   def initialize
     @board = Board.new
@@ -101,22 +124,6 @@ class Game
     pretty_keys.join(', ')
   end
 
-  def display_board
-    puts ""
-    puts "     |     |"
-    puts "  #{board.get_square_at(1)}  |  #{board.get_square_at(2)}  |  #{board.get_square_at(3)}"
-    puts "     |     |"
-    puts "-----+-----+----"
-    puts "     |     |"
-    puts "  #{board.get_square_at(4)}  |  #{board.get_square_at(5)}  |  #{board.get_square_at(6)}"
-    puts "     |     |"
-    puts "-----+-----+----"
-    puts "     |     |"
-    puts "  #{board.get_square_at(7)}  |  #{board.get_square_at(8)}  |  #{board.get_square_at(9)}"
-    puts "     |     |"
-    puts ""
-  end
-
   def human_move
     puts "Choose a square: #{joinor}"
     square = ''
@@ -126,81 +133,123 @@ class Game
       puts 'Sorry, that\'s not a valid choice'
     end
 
-    board.set_square_at(square, human.marker) 
+    board.[]=(square, human.marker) 
   end
 
-   
-
-  def evaluate_offensive_or_defensive_moves
+  def evaluate_offensive_or_defensive_moves(move_type)
     moves = []
-
-    WINNING_LINES.each do |line|
-      squares_to_check = board.find_human_moves if move_type == :offense
-      squares_to_check = board.find_computer_moves if move_type == :defense
-      move_key = line - squares_to_check
-      if moves.size == 1 && board.squares[moves[0]] == BLANK_MARK
+    WIN_LINES.each do |line|
+      squares_to_check = board.find_computer_moves if move_type == :offense
+      squares_to_check = board.find_human_moves if move_type == :defense
+      moves = line - squares_to_check
+      if moves.size == 1 && board.squares[moves[0]].marker == Board::BLANK_MARK
         return moves[0]
       end
     end
     nil
   end
 
-  def evaluate_moves(brd)
+  def evaluate_moves
     if evaluate_offensive_or_defensive_moves(:offense)
       evaluate_offensive_or_defensive_moves(:offense)
     elsif evaluate_offensive_or_defensive_moves(:defense)
       evaluate_offensive_or_defensive_moves(:defense)
-    elsif board.squares[PRIORITY_MOVE] == BLANK_MARK
+    elsif board.squares[PRIORITY_MOVE].marker == Board::BLANK_MARK
       PRIORITY_MOVE 
     else
-      empty_squares(brd).sample
+      board.empty_squares_keys.sample
     end
   end
 
+  def computer_move!
+    board.[]=(evaluate_moves, computer.marker)
+  end
 
   def computer_move
     square = board.empty_squares_keys.sample
-    board.set_square_at(square, computer.marker)
+    board.[]=(square, computer.marker)
   end
 
-  def check_for_winner
+  # def winning_mark
+  #   marks = board.find_marks
+  # end
+
+  def winning_marker
     human_moves = board.find_human_moves
     comp_moves = board.find_computer_moves
     WIN_LINES.each do |line|
-      #binding.pry
       if (line - human_moves).empty?
-        return "You win!"
+        return :X
       elsif (line - comp_moves).empty?
-        return "Computer wins!"
+        return :O
       end
     end
     nil
   end
 
   def winner?
-    !!check_for_winner
+    !!winning_marker
   end
 
+  def display_winning_message
+    result = winning_marker
+
+    case result
+    when :X
+      puts "You won the game!"
+    when :O
+      puts "Computer won the game!"
+    end
+  end
+
+
   def display_result
-    puts "#{check_for_winner}"
+    if winner?
+      display_winning_message
+    else
+      puts 'It\'s a tie!'
+    end
+  end
+
+  def play_again?
+    answer = ''
+    puts 'Would you like to play again?(y/n)'
+    loop do
+      answer = gets.chomp.downcase
+      break if answer.start_with?('y','n')
+      puts 'Sorry, that\'s not a valid response'
+    end
+    answer == 'y'
+  end
+
+  def reset
+    board.reset
+    board.clear
+    puts "Ok, let's play again!"
+    puts ""
   end
 
   def play
     display_welcome_message
-    display_board
+    board.clear
     loop do
-      human_move
-      break if winner? || board.full?
-
-      computer_move
-      break if board.full?
-      display_board
-      #break if winner? || !empty_squares?
+      board.draw
+      loop do
+        human_move
+        board.clear_screen_and_display_board
+        break if winner? || board.full?
+        computer_move!
+        board.clear_screen_and_display_board
+        break if winner? || board.full?
+        binding.pry
+        board.find_player_marks
+      end
+      display_result
+      break unless play_again?
+      reset
     end
-    display_result
     display_goodbye_message
   end
 end
 
 Game.new.play
-
