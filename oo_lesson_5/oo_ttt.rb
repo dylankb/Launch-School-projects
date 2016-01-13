@@ -62,7 +62,6 @@ class Board
   end
 
   def find_human_moves
-    #binding.pry
     find_marks[Game::HUMAN_MARKER]
   end
 
