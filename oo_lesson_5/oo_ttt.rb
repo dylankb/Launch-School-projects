@@ -100,6 +100,7 @@ class Game
   COMPUTER_MARKER = 'O'
   WIN_LINES = [[1,2,3],[4,5,6],[7,8,9],[1,4,7],[2,5,8],[3,6,9],[1,5,9],[3,5,7]]
   PRIORITY_MOVE = 5
+  FIRST_TO_MOVE = HUMAN_MARKER
 
   attr_reader :board, :human, :computer
 
@@ -107,7 +108,7 @@ class Game
     @board = Board.new
     @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
-    @current_marker = HUMAN_MARKER
+    @current_marker = FIRST_TO_MOVE
   end
 
   def display_welcome_message
@@ -218,6 +219,7 @@ class Game
     board.clear
     puts "Ok, let's play again!"
     puts ""
+    @current_marker = FIRST_TO_MOVE
   end
 
   def current_player_move
@@ -235,17 +237,6 @@ class Game
       @current_marker = HUMAN_MARKER
     end
   end
-
-  # def round_of_game_play
-  #   loop do
-  #     human_move
-      # board.clear_screen_and_display_board
-      # break if winner? || board.full?
-      # computer_move!
-      # board.clear_screen_and_display_board
-      # break if winner? || board.full?
-  #   end
-  # end
 
   def round_of_game_play
     loop do
