@@ -107,6 +107,7 @@ class Game
     @board = Board.new
     @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
+    @current_marker = HUMAN_MARKER
   end
 
   def display_welcome_message
@@ -161,25 +162,16 @@ class Game
     end
   end
 
-  def computer_move!
+  def computer_move
     board.[]=(evaluate_moves, computer.marker)
   end
 
-  def computer_move
-    square = board.empty_squares_keys.sample
-    board.[]=(square, computer.marker)
-  end
-
-  # def winning_mark
-  #   marks = board.find_marks
-  # end
-
   def winning_marker
     player_marks = board.find_marks
-    player_marks.each do |mark, marks|
+    player_marks.each do |mark, marked|
       WIN_LINES.each do |line|
-        if (line - marks).empty?
-          return mark.to_sym
+        if (line - marked).empty?
+          return mark
         end
       end
     end
@@ -194,9 +186,9 @@ class Game
     result = winning_marker
 
     case result
-    when :X
+    when HUMAN_MARKER
       puts "You won the game!"
-    when :O
+    when COMPUTER_MARKER
       puts "Computer won the game!"
     end
   end
@@ -228,14 +220,39 @@ class Game
     puts ""
   end
 
+  def current_player_move
+    if @current_marker == HUMAN_MARKER
+      human_move
+    else
+      computer_move
+    end
+  end
+
+  def alternate_player
+    if @current_marker == HUMAN_MARKER
+      @current_marker = COMPUTER_MARKER
+    else
+      @current_marker = HUMAN_MARKER
+    end
+  end
+
+  # def round_of_game_play
+  #   loop do
+  #     human_move
+      # board.clear_screen_and_display_board
+      # break if winner? || board.full?
+      # computer_move!
+      # board.clear_screen_and_display_board
+      # break if winner? || board.full?
+  #   end
+  # end
+
   def round_of_game_play
     loop do
-      human_move
+      current_player_move
       board.clear_screen_and_display_board
       break if winner? || board.full?
-      computer_move!
-      board.clear_screen_and_display_board
-      break if winner? || board.full?
+      alternate_player
     end
   end
 
