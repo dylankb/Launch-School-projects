@@ -60,14 +60,27 @@ class Board
     empty_squares_keys.empty?
   end
 
+ def find_marks
+    marks = {}
+    @squares.each do |key, info|
+      if info.marker == BLANK_MARK
+        next
+      elsif marks.has_key?(info.marker)
+        marks[info.marker] << key
+      else
+        marks[info.marker] = []
+        marks[info.marker] << key
+      end
+    end
+    marks
+  end
+
   def find_human_moves
-    human_squares = @squares.select { |key, info| info.marker == 'X' }
-    human_squares.keys
+    find_marks[Game::HUMAN_MARKER].values
   end
 
   def find_computer_moves
-    computer_squares = @squares.select { |key, info| info.marker == 'O' }
-    computer_squares.keys
+    find_marks[Game::COMPUTER_MARKER].values
   end
 
   def reset
