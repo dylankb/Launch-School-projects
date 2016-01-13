@@ -76,11 +76,12 @@ class Board
   end
 
   def find_human_moves
-    find_marks[Game::HUMAN_MARKER].values
+    #binding.pry
+    find_marks[Game::HUMAN_MARKER]
   end
 
   def find_computer_moves
-    find_marks[Game::COMPUTER_MARKER].values
+    computer_moves = find_marks[Game::COMPUTER_MARKER] || []
   end
 
   def reset
@@ -154,6 +155,7 @@ class Game
     WIN_LINES.each do |line|
       squares_to_check = board.find_computer_moves if move_type == :offense
       squares_to_check = board.find_human_moves if move_type == :defense
+      #binding.pry
       moves = line - squares_to_check
       if moves.size == 1 && board.squares[moves[0]].marker == Board::BLANK_MARK
         return moves[0]
@@ -188,8 +190,9 @@ class Game
   # end
 
   def winning_marker
+    #binding.pry
     human_moves = board.find_human_moves
-    comp_moves = board.find_computer_moves
+    comp_moves = board.find_computer_moves || []
     WIN_LINES.each do |line|
       if (line - human_moves).empty?
         return :X
@@ -254,8 +257,6 @@ class Game
         computer_move!
         board.clear_screen_and_display_board
         break if winner? || board.full?
-        binding.pry
-        board.find_player_marks
       end
       display_result
       break unless play_again?
