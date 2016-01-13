@@ -228,19 +228,23 @@ class Game
     puts ""
   end
 
+  def round_of_game_play
+    loop do
+      human_move
+      board.clear_screen_and_display_board
+      break if winner? || board.full?
+      computer_move!
+      board.clear_screen_and_display_board
+      break if winner? || board.full?
+    end
+  end
+
   def play
     display_welcome_message
     board.clear
     loop do
       board.draw
-      loop do
-        human_move
-        board.clear_screen_and_display_board
-        break if winner? || board.full?
-        computer_move!
-        board.clear_screen_and_display_board
-        break if winner? || board.full?
-      end
+      round_of_game_play
       display_result
       break unless play_again?
       reset
