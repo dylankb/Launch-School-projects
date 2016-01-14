@@ -8,7 +8,6 @@ class Board
   end
   
   def draw
-    clear
     puts ""
     puts "     |     |"
     puts "  #{squares[1]}  |  #{squares[2]}  |  #{squares[3]}"
@@ -22,15 +21,6 @@ class Board
     puts "  #{squares[7]}  |  #{squares[8]}  |  #{squares[9]}"
     puts "     |     |"
     puts ""
-  end
-
-  def clear
-    system 'clear' or system 'cls'
-  end
-
-  def clear_screen_and_display_board
-    clear
-    draw
   end
 
   def []=(key, marker)
@@ -119,6 +109,15 @@ class Game
     pretty_keys.join(', ')
   end
 
+  def clear
+    system 'clear' or system 'cls'
+  end
+
+  def clear_screen_and_display_board
+    clear
+    display_board
+  end
+
   def human_move
     puts "Choose a square: #{joinor}"
     square = ''
@@ -145,10 +144,10 @@ class Game
   end
 
   def evaluate_moves
-    if evaluate_offensive_or_defensive_moves(:offense)
-      evaluate_offensive_or_defensive_moves(:offense)
-    elsif evaluate_offensive_or_defensive_moves(:defense)
-      evaluate_offensive_or_defensive_moves(:defense)
+    if offensive_moves = evaluate_offensive_or_defensive_moves(:offense)
+      offensive_moves
+    elsif defensive_moves = evaluate_offensive_or_defensive_moves(:defense)
+      defensive_moves
     elsif board.squares[PRIORITY_MOVE].marker == Board::BLANK_MARK
       PRIORITY_MOVE 
     else
@@ -209,9 +208,10 @@ class Game
 
   def reset
     board.reset
-    board.clear
+    clear
     puts "Ok, let's play again!"
     puts ""
+    display_board
     @current_marker = FIRST_TO_MOVE
   end
 
@@ -231,10 +231,17 @@ class Game
     end
   end
 
+  def display_board
+    puts "Your marker: #{HUMAN_MARKER} | Computer marker: #{COMPUTER_MARKER}"
+    puts ""
+    board.draw
+    puts ""
+  end
+
   def round_of_game_play
     loop do
       current_player_move
-      board.clear_screen_and_display_board
+      clear_screen_and_display_board
       break if winner? || board.full?
       alternate_player
     end
@@ -242,13 +249,17 @@ class Game
 
   def play
     display_welcome_message
-    board.clear
-    loop do
-      board.draw
-      round_of_game_play
-      display_result
-      break unless play_again?
-      reset
+    clear
+    loop do 
+      display_board
+
+      loop do
+        round_of_game_play
+        display_result
+        break unless play_again?
+        reset
+      end
+
     end
     display_goodbye_message
   end
