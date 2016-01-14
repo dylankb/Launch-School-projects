@@ -36,7 +36,7 @@ class Board
     empty_squares_keys.empty?
   end
 
- def find_marks
+  def find_marks
     marks = { Game::HUMAN_MARKER => [], Game::COMPUTER_MARKER=> []}
     @squares.each do |key, info|
       next if info.marker == BLANK_MARK
@@ -54,8 +54,8 @@ class Board
   end
 
   def reset
-    (1..9).each {|key| @squares[key] = Square.new(BLANK_MARK)}
-  end     
+    (1..9).each { |key| @squares[key] = Square.new(BLANK_MARK) }
+  end
 end
 
 class Square
@@ -77,11 +77,10 @@ class Player
   end
 end
 
-
 class Game
   HUMAN_MARKER = 'X'
   COMPUTER_MARKER = 'O'
-  WIN_LINES = [[1,2,3],[4,5,6],[7,8,9],[1,4,7],[2,5,8],[3,6,9],[1,5,9],[3,5,7]]
+  WIN_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8],[3, 6, 9], [1, 5, 9], [3, 5, 7]]
   PRIORITY_MOVE = 5
   FIRST_TO_MOVE = HUMAN_MARKER
 
@@ -97,7 +96,7 @@ class Game
   def play
     display_welcome_message
     clear
-    loop do 
+    loop do
       display_board
 
       round_of_game_play
@@ -167,7 +166,7 @@ end
     elsif defensive_moves = evaluate_offensive_or_defensive_moves(:defense)
       defensive_moves
     elsif board.squares[Game::PRIORITY_MOVE].marker == Board::BLANK_MARK
-      Game::PRIORITY_MOVE 
+      Game::PRIORITY_MOVE
     else
       board.empty_squares_keys.sample
     end
@@ -217,7 +216,7 @@ end
     puts 'Would you like to play again?(y/n)'
     loop do
       answer = gets.chomp.downcase
-      break if answer.start_with?('y','n')
+      break if answer.start_with?('y', 'n')
       puts 'Sorry, that\'s not a valid response'
     end
     answer == 'y'
