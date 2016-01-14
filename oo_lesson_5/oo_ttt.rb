@@ -70,10 +70,25 @@ class Square
 end
 
 class Player
+  attr_accessor :name
   attr_reader :marker
 
   def initialize(marker)
     @marker = marker
+    get_name
+  end
+
+  def get_name
+    if self.marker == Game::HUMAN_MARKER
+      puts "Welcome to Tic-Tac-Toe!"
+      puts "What's your name?"
+      loop do
+        self.name = gets.chomp
+        break unless self.name.empty?
+      end
+    elsif self.marker == Game::COMPUTER_MARKER
+      self.name = ['BB8','Watson','Deep Blue'].sample
+    end
   end
 end
 
@@ -94,11 +109,9 @@ class Game
   end
 
   def play
-    display_welcome_message
     clear
     loop do
       display_board
-
       round_of_game_play
       display_result
       break unless play_again?
@@ -107,14 +120,8 @@ class Game
     end
     display_goodbye_message
   end
-end
 
   private
-
-  def display_welcome_message
-    puts 'Welcome to Tic-Tac-Toe!'
-    puts ''
-  end
 
   def display_goodbye_message
     puts 'Thanks for playing. Goodbye!'
@@ -249,7 +256,7 @@ end
 
   def display_board
     clear
-    puts "Your marker: #{human.marker} | Computer marker: #{computer.marker}"
+    puts "#{human.name}'s marker: #{human.marker} | #{computer.name}'s marker: #{computer.marker}"
     puts ""
     board.draw
     puts ""
@@ -263,6 +270,7 @@ end
       alternate_player
     end
   end
+end
 
 game = Game.new
 game.play
