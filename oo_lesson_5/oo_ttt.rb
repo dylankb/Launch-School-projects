@@ -47,16 +47,10 @@ class Board
   end
 
  def find_marks
-    marks = {}
+    marks = { Game::HUMAN_MARKER => [], Game::COMPUTER_MARKER}
     @squares.each do |key, info|
-      if info.marker == BLANK_MARK
-        next
-      elsif marks.has_key?(info.marker)
-        marks[info.marker] << key
-      else
-        marks[info.marker] = []
-        marks[info.marker] << key
-      end
+      next if info.marker == BLANK_MARK
+      marks[info.marker] << key
     end
     marks
   end
