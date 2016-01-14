@@ -94,6 +94,24 @@ class Game
     @current_marker = FIRST_TO_MOVE
   end
 
+  def play
+    display_welcome_message
+    clear
+    loop do 
+      display_board
+
+      round_of_game_play
+      display_result
+      break unless play_again?
+      reset
+
+    end
+    display_goodbye_message
+  end
+end
+
+  private
+
   def display_welcome_message
     puts 'Welcome to Tic-Tac-Toe!'
     puts ''
@@ -132,7 +150,7 @@ class Game
 
   def evaluate_offensive_or_defensive_moves(move_type)
     moves = []
-    WIN_LINES.each do |line|
+    Game::WIN_LINES.each do |line|
       squares_to_check = board.find_computer_moves if move_type == :offense
       squares_to_check = board.find_human_moves if move_type == :defense
       moves = line - squares_to_check
@@ -148,8 +166,8 @@ class Game
       offensive_moves
     elsif defensive_moves = evaluate_offensive_or_defensive_moves(:defense)
       defensive_moves
-    elsif board.squares[PRIORITY_MOVE].marker == Board::BLANK_MARK
-      PRIORITY_MOVE 
+    elsif board.squares[Game::PRIORITY_MOVE].marker == Board::BLANK_MARK
+      Game::PRIORITY_MOVE 
     else
       board.empty_squares_keys.sample
     end
@@ -162,7 +180,7 @@ class Game
   def winning_marker
     player_marks = board.find_marks
     player_marks.each do |mark, marked|
-      WIN_LINES.each do |line|
+      Game::WIN_LINES.each do |line|
         if (line - marked).empty?
           return mark
         end
@@ -179,13 +197,12 @@ class Game
     result = winning_marker
 
     case result
-    when HUMAN_MARKER
+    when Game::HUMAN_MARKER
       puts "You won the game!"
-    when COMPUTER_MARKER
+    when Game::COMPUTER_MARKER
       puts "Computer won the game!"
     end
   end
-
 
   def display_result
     if winner?
@@ -212,11 +229,11 @@ class Game
     puts "Ok, let's play again!"
     puts ""
     display_board
-    @current_marker = FIRST_TO_MOVE
+    @current_marker = Game::FIRST_TO_MOVE
   end
 
   def current_player_move
-    if @current_marker == HUMAN_MARKER
+    if @current_marker == Game::HUMAN_MARKER
       human_move
     else
       computer_move
@@ -224,15 +241,16 @@ class Game
   end
 
   def alternate_player
-    if @current_marker == HUMAN_MARKER
-      @current_marker = COMPUTER_MARKER
+    if @current_marker == Game::HUMAN_MARKER
+      @current_marker = Game::COMPUTER_MARKER
     else
-      @current_marker = HUMAN_MARKER
+      @current_marker = Game::HUMAN_MARKER
     end
   end
 
   def display_board
-    puts "Your marker: #{HUMAN_MARKER} | Computer marker: #{COMPUTER_MARKER}"
+    clear
+    puts "Your marker: #{human.marker} | Computer marker: #{computer.marker}"
     puts ""
     board.draw
     puts ""
@@ -247,22 +265,5 @@ class Game
     end
   end
 
-  def play
-    display_welcome_message
-    clear
-    loop do 
-      display_board
-
-      loop do
-        round_of_game_play
-        display_result
-        break unless play_again?
-        reset
-      end
-
-    end
-    display_goodbye_message
-  end
-end
-
-Game.new.play
+game = Game.new
+game.play
