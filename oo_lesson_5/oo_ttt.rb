@@ -1,3 +1,9 @@
+module Clearable
+  def clear
+    system 'clear' or system 'cls'
+  end
+end
+
 class Board
   attr_reader :squares
   BLANK_MARK = ' '
@@ -70,17 +76,21 @@ class Square
 end
 
 class Player
-  attr_accessor :name
+  include Clearable
+  attr_accessor :name, :games_won
   attr_reader :marker
 
   def initialize(marker)
     @marker = marker
+    @games_won = 0
     get_name
   end
 
   def get_name
     if self.marker == Game::HUMAN_MARKER
+      clear
       puts "Welcome to Tic-Tac-Toe!"
+      puts ""
       puts "What's your name?"
       loop do
         self.name = gets.chomp
@@ -93,11 +103,13 @@ class Player
 end
 
 class Game
+  include Clearable
   HUMAN_MARKER = 'X'
   COMPUTER_MARKER = 'O'
   WIN_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8],[3, 6, 9], [1, 5, 9], [3, 5, 7]]
   PRIORITY_MOVE = 5
   FIRST_TO_MOVE = HUMAN_MARKER
+  GAMES_TO_WIN = 2
 
   attr_reader :board, :human, :computer
 
@@ -114,14 +126,24 @@ class Game
       display_board
       round_of_game_play
       display_result
-      break unless play_again?
+      calculate_score
+      break unless !match_winner? && play_again?
       reset
-
     end
+    display_match_result
     display_goodbye_message
   end
 
   private
+
+  def round_of_game_play
+    loop do
+      current_player_move
+      clear_screen_and_display_board
+      break if winner? || board.full?
+      alternate_player
+    end
+  end
 
   def display_goodbye_message
     puts 'Thanks for playing. Goodbye!'
@@ -131,10 +153,6 @@ class Game
     pretty_keys = board.empty_squares_keys
     pretty_keys[-1] = 'or ' + board.empty_squares_keys[-1].to_s
     pretty_keys.join(', ')
-  end
-
-  def clear
-    system 'clear' or system 'cls'
   end
 
   def clear_screen_and_display_board
@@ -199,14 +217,48 @@ class Game
     !!winning_marker
   end
 
+  def calculate_score
+    result = winning_marker
+
+    case result
+    when human.marker
+      human.games_won += 1
+    when computer.marker
+      computer.games_won +=1
+    end
+  end
+
+  def won_match
+    if human.games_won == Game::GAMES_TO_WIN
+      :human
+    elsif computer.games_won == Game::GAMES_TO_WIN
+      :computer
+    end
+  end
+
+  def match_winner?
+    !!won_match
+  end
+
+  def display_match_result
+    result = won_match
+
+    case result
+    when :human
+      puts "#{human.name} won the match!!"
+    when :computer
+      puts "#{computer.name} won the match!!"
+    end
+  end
+
   def display_winning_message
     result = winning_marker
 
     case result
     when Game::HUMAN_MARKER
-      puts "You won the game!"
+      puts "#{human.name} won the game!"
     when Game::COMPUTER_MARKER
-      puts "Computer won the game!"
+      puts "#{computer.name} won the game!"
     end
   end
 
@@ -260,15 +312,6 @@ class Game
     puts ""
     board.draw
     puts ""
-  end
-
-  def round_of_game_play
-    loop do
-      current_player_move
-      clear_screen_and_display_board
-      break if winner? || board.full?
-      alternate_player
-    end
   end
 end
 
