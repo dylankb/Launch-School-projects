@@ -47,7 +47,7 @@ class Board
   end
 
  def find_marks
-    marks = { Game::HUMAN_MARKER => [], Game::COMPUTER_MARKER}
+    marks = { Game::HUMAN_MARKER => [], Game::COMPUTER_MARKER=> []}
     @squares.each do |key, info|
       next if info.marker == BLANK_MARK
       marks[info.marker] << key
@@ -60,7 +60,7 @@ class Board
   end
 
   def find_computer_moves
-    computer_moves = find_marks[Game::COMPUTER_MARKER] || []
+    find_marks[Game::COMPUTER_MARKER] || []
   end
 
   def reset
@@ -128,7 +128,7 @@ class Game
       puts 'Sorry, that\'s not a valid choice'
     end
 
-    board.[]=(square, human.marker) 
+    board[square] = human.marker
   end
 
   def evaluate_offensive_or_defensive_moves(move_type)
