@@ -1,15 +1,17 @@
 module Recordable
-  attr_accessor :deck
 
-  def hit(actions, deck)
+  def hit_and_record(actions, deck)
     new_card = deck.deal
     self.add_card(new_card)
-    actions << "#{self.name} drew the #{new_card}"
+    actions << "#{self.name} drew the #{new_card} | #{self.total}"
+  end
+
+  def record_action(actions, deck, action)
+    actions << "#{self.name} #{action} at #{self.total}"
   end
 end
 
 class Deck
-  include Recordable
   attr_reader :cards
 
   def initialize
@@ -130,6 +132,10 @@ class Dealer < Player
     super
   end
 
+  def get_move
+    dealer.total < 17 ? :hit : :stay
+  end
+
   def get_name
     @name = ['Tron', 'Dolly', 'Fat Man', 'Lttle Boy'].sample
   end
@@ -138,6 +144,7 @@ end
 class Game
   include Recordable
   attr_accessor :deck, :user, :dealer, :cards, :actions
+  attr_reader :name
 
 
   TWENTYONE = 21
@@ -179,9 +186,9 @@ class Game
       display_game_action
       answer = user.get_move
       if answer.start_with?('h')
-        user.hit(actions, deck)
+        user.hit_and_record(actions, deck)
       elsif answer.start_with?('s')
-        actions << "#{user.name} chose to stay at #{user.total}"
+        record_action(actions, deck, 'stays')
         break
       end
       display_game_action
@@ -193,13 +200,14 @@ class Game
     loop do
       break if user.busted?
       sleep(1.5)
-      if dealer.total < 17
-        dealer.hit(actions, deck)
+      move = dealer.get_move
+      if :hit
+        dealer.hit_and_record(actions, deck)
       else
         if dealer.busted?
-          actions << "#{dealer.name} busts at #{dealer.total}!"
+          record_action(actions, deck, 'busts')
         else 
-          actions << "#{dealer.name} stays at #{dealer.total}"
+          record_action(actions, deck, 'stays')
         end
         break
       end
