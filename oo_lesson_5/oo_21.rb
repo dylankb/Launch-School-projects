@@ -1,5 +1,3 @@
-require 'pry'
-
 class Deck
   attr_reader :cards
 
@@ -119,7 +117,7 @@ class Game
   def initialize
     @deck = Deck.new
     @user = User.new('You')
-    @dealer = Dealer.new('Computer')
+    @dealer = Dealer.new('Dealer')
   end
 
   def display_welcome_message
@@ -133,10 +131,15 @@ class Game
     end
   end
 
+  def show_player_hands
+    @user.show_hand
+    @dealer.show_hand
+  end
+
   def user_turn
     loop do
       clear
-      @user.show_hand
+      show_player_hands
       answer = @user.get_move
       @user.hit(@deck.deal) if answer.start_with?('h')   
       break if answer.start_with?('s') || @user.busted?
@@ -145,10 +148,16 @@ class Game
 
   def dealer_turn
     loop do
-      break unless @dealer.total >= 17
-      @dealer.hit(@deck.deal)
+      clear
+      show_player_hands
+      if @dealer.total < 17
+        @dealer.hit(@deck.deal)
+        @dealer.show_hand
+      else
+        puts 'Dealer stays'
+        break
+      end
     end
-    @dealer.show_hand
   end
 
   def display_goodbye_message
@@ -183,7 +192,6 @@ class Game
     display_welcome_message
     deal_initial_hands
     user_turn
-    binding.pry
     dealer_turn
     display_result
     display_goodbye_message
