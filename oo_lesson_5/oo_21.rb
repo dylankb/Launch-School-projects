@@ -1,4 +1,15 @@
+module Recordable
+  attr_accessor :deck
+
+  def hit(actions, deck)
+    new_card = deck.deal
+    self.add_card(new_card)
+    actions << "#{self.name} drew the #{new_card}"
+  end
+end
+
 class Deck
+  include Recordable
   attr_reader :cards
 
   def initialize
@@ -46,11 +57,12 @@ class Card
 end
 
 class Player
+  include Recordable
   attr_accessor :hand, :name
 
-  def initialize(name)
+  def initialize
     @hand = []
-    @name = name
+    get_name
   end
 
   def show_hand
@@ -62,12 +74,12 @@ class Player
     puts ""
   end
 
-  def hit(card)
+  def add_card(card)
     self.hand << card
   end
 
   def busted?
-    self.total > Game::BLACKJACK
+    self.total > Game::TWENTYONE
   end
 
   def total
@@ -82,7 +94,7 @@ class Player
     end
 
     hand.select {|card| card.face_value == 'A'}.size.times do
-      break if sum <= Game::BLACKJACK
+      break if sum <= Game::TWENTYONE
       sum -= 10
     end
     sum
@@ -90,7 +102,7 @@ class Player
 end
 
 class User < Player
-  def initialize(name)
+  def initialize
     super
   end
 
@@ -103,23 +115,39 @@ class User < Player
     end
     answer
   end
+
+  def get_name
+    puts "What's your name?"
+    loop do
+      @name = gets.chomp
+      break unless @name.empty?
+    end
+  end
 end
 
 class Dealer < Player
-  def initialize(name)
+  def initialize
     super
+  end
+
+  def get_name
+    @name = ['Tron', 'Dolly', 'Fat Man', 'Lttle Boy'].sample
   end
 end
 
 class Game
-  attr_accessor :deck, :user, :dealer, :cards
+  include Recordable
+  attr_accessor :deck, :user, :dealer, :cards, :actions
 
-  BLACKJACK = 21
+
+  TWENTYONE = 21
+  DEALER_STAY_MIN = 17
 
   def initialize
     @deck = Deck.new
-    @user = User.new('You')
-    @dealer = Dealer.new('Dealer')
+    @user = User.new
+    @dealer = Dealer.new
+    @actions = []
   end
 
   def display_welcome_message
@@ -129,9 +157,16 @@ class Game
 
   def deal_initial_hands
     2.times do
-      user.hit(deck.deal)
-      dealer.hit(deck.deal)
+      user.add_card(deck.deal)
+      dealer.add_card(deck.deal)
     end
+  end
+
+  def display_game_action
+    clear
+    actions.each { |action| puts action }
+    puts ""
+    show_player_hands
   end
 
   def show_player_hands
@@ -141,38 +176,36 @@ class Game
 
   def user_turn
     while !user.busted?
-      show_player_hands
+      display_game_action
       answer = user.get_move
-      clear
       if answer.start_with?('h')
-        new_card = deck.deal
-        puts "#{user.name} drew #{new_card}"
-        puts ""
-        user.hit(new_card)
+        user.hit(actions, deck)
       elsif answer.start_with?('s')
-        puts "#{user.name} chose to stay"
+        actions << "#{user.name} chose to stay at #{user.total}"
         break
       end
+      display_game_action
     end
+    display_game_action
   end
 
   def dealer_turn
-    clear
     loop do
-      show_player_hands
+      break if user.busted?
+      sleep(1.5)
       if dealer.total < 17
-        new_card = deck.deal
-        puts "#{dealer.name} took a #{new_card}"
-        dealer.hit(new_card)
+        dealer.hit(actions, deck)
       else
         if dealer.busted?
-          puts 'Dealer busted!'
+          actions << "#{dealer.name} busts at #{dealer.total}!"
         else 
-          puts 'Dealer stays'
+          actions << "#{dealer.name} stays at #{dealer.total}"
         end
         break
       end
+      display_game_action
     end
+    display_game_action
   end
 
   def display_goodbye_message
@@ -184,6 +217,8 @@ class Game
       :dealer
     elsif dealer.busted?
       :user
+    elsif user.total == dealer.total
+      :tie
     else
       user.total > dealer.total ? :user : :dealer
     end
@@ -202,15 +237,20 @@ class Game
     result = evalutate_result
     case result
     when :user
-      puts "#{user.name} won!!"
+      puts "#{user.name} won with #{user.total}!!"
     when :dealer
-      puts "#{dealer.name} won!"
+      puts "#{dealer.name} won with #{dealer.total}!"
+    when :tie
+      puts "It was a tie at #{user.total}..."
     end
   end
 
-  def display_scores
-    puts "#{user.name} had #{user.total}"
-    puts "#{dealer.name} had #{dealer.total}"
+  def twentyone?
+    user.total == TWENTYONE || dealer.total == TWENTYONE
+  end
+
+  def display_twentyone
+    user.total == 21 ? "#{user.name} got a 21!!!" : "#{dealer.name} got a 21!!!"
   end
 
   def clear
@@ -219,14 +259,10 @@ class Game
 
   def game_round
     user_turn
-    if user.busted?
-      puts "#{user.name} busted!"
-      display_result
-    else
-      dealer_turn
-      display_scores
-      display_result
-    end
+    actions << "#{user.name} busted with #{user.total}!" if user.busted?
+    dealer_turn
+    display_result
+    puts display_twentyone if twentyone?
   end
 
   def start
