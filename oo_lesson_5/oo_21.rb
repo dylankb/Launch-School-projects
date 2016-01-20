@@ -25,7 +25,7 @@ class Card
   end
 
   def to_s
-    puts "#{pretty_output(face_value)} of #{pretty_output(suit)}"
+    "#{pretty_output(face_value)} of #{pretty_output(suit)}"
   end
 
   def pretty_output(string)
@@ -42,6 +42,7 @@ class Card
       string
     end
   end
+
 end
 
 class Player
@@ -57,7 +58,8 @@ class Player
     hand.each do |card|
       puts "#{card}"
     end
-    puts "Total: #{total}"
+    puts "=> Total: #{total}"
+    puts ""
   end
 
   def hit(card)
@@ -110,7 +112,7 @@ class Dealer < Player
 end
 
 class Game
-  attr_accessor = :deck, :user, :dealer, :cards
+  attr_accessor :deck, :user, :dealer, :cards
 
   BLACKJACK = 21
 
@@ -122,39 +124,52 @@ class Game
 
   def display_welcome_message
     puts "Welcome to Blackjack!"
+    puts ""
   end
 
   def deal_initial_hands
     2.times do
-      @user.hit(@deck.deal)
-      @dealer.hit(@deck.deal)
+      user.hit(deck.deal)
+      dealer.hit(deck.deal)
     end
   end
 
   def show_player_hands
-    @user.show_hand
-    @dealer.show_hand
+    user.show_hand
+    dealer.show_hand
   end
 
   def user_turn
-    loop do
-      clear
+    while !user.busted?
       show_player_hands
-      answer = @user.get_move
-      @user.hit(@deck.deal) if answer.start_with?('h')   
-      break if answer.start_with?('s') || @user.busted?
+      answer = user.get_move
+      clear
+      if answer.start_with?('h')
+        new_card = deck.deal
+        puts "#{user.name} drew #{new_card}"
+        puts ""
+        user.hit(new_card)
+      elsif answer.start_with?('s')
+        puts "#{user.name} chose to stay"
+        break
+      end
     end
   end
 
   def dealer_turn
+    clear
     loop do
-      clear
       show_player_hands
-      if @dealer.total < 17
-        @dealer.hit(@deck.deal)
-        @dealer.show_hand
+      if dealer.total < 17
+        new_card = deck.deal
+        puts "#{dealer.name} took a #{new_card}"
+        dealer.hit(new_card)
       else
-        puts 'Dealer stays'
+        if dealer.busted?
+          puts 'Dealer busted!'
+        else 
+          puts 'Dealer stays'
+        end
         break
       end
     end
@@ -165,35 +180,58 @@ class Game
   end
 
   def evalutate_result
-    if @user.busted?
+    if user.busted?
       :dealer
-    elsif @dealer.busted?
+    elsif dealer.busted?
       :user
     else
-      @user.total > @dealer.total ? :user : :dealer
+      user.total > dealer.total ? :user : :dealer
     end
+  end
+
+  def game_intro
+    clear
+    display_welcome_message
+    puts "Dealing cards..."
+    puts ""
+    sleep(2)
+    deal_initial_hands
   end
 
   def display_result
     result = evalutate_result
     case result
     when :user
-      puts "#{@user.name} won!!"
+      puts "#{user.name} won!!"
     when :dealer
-      puts "#{@dealer.name} won!"
+      puts "#{dealer.name} won!"
     end
+  end
+
+  def display_scores
+    puts "#{user.name} had #{user.total}"
+    puts "#{dealer.name} had #{dealer.total}"
   end
 
   def clear
     system 'clear' or system 'cls'
   end
 
-  def start
-    display_welcome_message
-    deal_initial_hands
+  def game_round
     user_turn
-    dealer_turn
-    display_result
+    if user.busted?
+      puts "#{user.name} busted!"
+      display_result
+    else
+      dealer_turn
+      display_scores
+      display_result
+    end
+  end
+
+  def start
+    game_intro
+    game_round
     display_goodbye_message
   end
 end
