@@ -3,7 +3,7 @@ module Recordable
   def hit_and_record(actions, deck)
     new_card = deck.deal
     self.add_card(new_card)
-    actions << "#{self.name} drew the #{new_card} | #{self.total}"
+    actions << "#{self.name} drew the #{new_card}"
   end
 
   def record_action(actions, action)
@@ -158,6 +158,8 @@ class Game
     game_round
     display_goodbye_message
   end
+
+  private
 
   def game_round
     user_turn
