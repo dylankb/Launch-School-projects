@@ -6,7 +6,7 @@ module Recordable
     actions << "#{self.name} drew the #{new_card} | #{self.total}"
   end
 
-  def record_action(actions, deck, action)
+  def record_action(actions, action)
     actions << "#{self.name} #{action} at #{self.total}"
   end
 end
@@ -132,10 +132,6 @@ class Dealer < Player
     super
   end
 
-  def get_move
-    dealer.total < 17 ? :hit : :stay
-  end
-
   def get_name
     @name = ['Tron', 'Dolly', 'Fat Man', 'Lttle Boy'].sample
   end
@@ -155,6 +151,20 @@ class Game
     @user = User.new
     @dealer = Dealer.new
     @actions = []
+  end
+
+  def start
+    game_intro
+    game_round
+    display_goodbye_message
+  end
+
+  def game_round
+    user_turn
+    user.record_action(actions, 'busted') if user.busted?
+    dealer_turn
+    display_result
+    puts display_twentyone if twentyone?
   end
 
   def display_welcome_message
@@ -188,7 +198,7 @@ class Game
       if answer.start_with?('h')
         user.hit_and_record(actions, deck)
       elsif answer.start_with?('s')
-        record_action(actions, deck, 'stays')
+        user.record_action(actions, 'stays')
         break
       end
       display_game_action
@@ -200,15 +210,10 @@ class Game
     loop do
       break if user.busted?
       sleep(1.5)
-      move = dealer.get_move
-      if :hit
+      if dealer.total < 17
         dealer.hit_and_record(actions, deck)
       else
-        if dealer.busted?
-          record_action(actions, deck, 'busts')
-        else 
-          record_action(actions, deck, 'stays')
-        end
+        dealer.busted? ? dealer.record_action(actions, 'busts') : dealer.record_action(actions, 'stays')
         break
       end
       display_game_action
@@ -217,6 +222,7 @@ class Game
   end
 
   def display_goodbye_message
+    puts ""
     puts "Thanks for playing Blackjack. Goodbye!"
   end
 
@@ -263,20 +269,6 @@ class Game
 
   def clear
     system 'clear' or system 'cls'
-  end
-
-  def game_round
-    user_turn
-    actions << "#{user.name} busted with #{user.total}!" if user.busted?
-    dealer_turn
-    display_result
-    puts display_twentyone if twentyone?
-  end
-
-  def start
-    game_intro
-    game_round
-    display_goodbye_message
   end
 end
 
