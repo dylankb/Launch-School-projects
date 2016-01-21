@@ -138,9 +138,7 @@ class Dealer < Player
 end
 
 class Game
-  include Recordable
   attr_accessor :deck, :user, :dealer, :cards, :actions
-  attr_reader :name
 
   TWENTYONE = 21
   DEALER_STAY_MIN = 17
