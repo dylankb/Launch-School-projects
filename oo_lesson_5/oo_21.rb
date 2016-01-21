@@ -1,13 +1,15 @@
+require 'pry'
+
 module Recordable
 
   def hit_and_record(actions, deck)
     new_card = deck.deal
-    self.add_card(new_card)
-    actions << "#{self.name} drew the #{new_card}"
+    add_card(new_card)
+    actions << "#{name} drew the #{new_card}"
   end
 
   def record_action(actions, action)
-    actions << "#{self.name} #{action} at #{self.total}"
+    actions << "#{name} #{action} at #{total}"
   end
 end
 
@@ -77,11 +79,11 @@ class Player
   end
 
   def add_card(card)
-    self.hand << card
+    hand << card
   end
 
   def busted?
-    self.total > Game::TWENTYONE
+    total > Game::TWENTYONE
   end
 
   def total
