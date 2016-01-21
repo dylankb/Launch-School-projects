@@ -110,9 +110,6 @@ class Player
 end
 
 class User < Player
-  def initialize
-    super
-  end
 
   def get_move
     puts 'Do you want to hit or stay?(h/s)'
@@ -134,9 +131,6 @@ class User < Player
 end
 
 class Dealer < Player
-  def initialize
-    super
-  end
 
   def get_name
     @name = ['Tron', 'Dolly', 'Fat Man', 'Lttle Boy'].sample
@@ -147,7 +141,6 @@ class Game
   include Recordable
   attr_accessor :deck, :user, :dealer, :cards, :actions
   attr_reader :name
-
 
   TWENTYONE = 21
   DEALER_STAY_MIN = 17
