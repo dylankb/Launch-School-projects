@@ -151,8 +151,11 @@ class Game
   end
 
   def start
-    game_intro
-    game_round
+    loop do
+      game_intro
+      game_round
+      break unless play_again?
+    end
     display_goodbye_message
   end
 
@@ -164,6 +167,17 @@ class Game
     dealer_turn
     display_result
     puts display_twentyone if twentyone?
+  end
+
+  def play_again?
+    puts 'Would you like to play again?(y/n)'
+    answer = nil
+    loop do 
+      answer = gets.chomp
+      break if answer.start_with?('y', 'n')
+    end
+
+    answer.start_with?('y')
   end
 
   def display_welcome_message
