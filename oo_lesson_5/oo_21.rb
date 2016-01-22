@@ -8,12 +8,6 @@ end
 
 module Recordable
 
-  def hit_and_record(actions, deck)
-    new_card = deck.deal
-    add_card(new_card)
-    actions << "#{name} drew the #{new_card}"
-  end
-
   def record_action(actions, action, card=:none)
     if card == :none
       actions << "#{name} #{action} at #{total}"
@@ -250,14 +244,17 @@ class Game
     dealer.show_hand(show)
   end
 
+  def get_card
+    deck.deal
+  end
+
   def user_turn
     while !user.busted?
       display_game_action
       answer = user.get_move
       if answer.start_with?('h')
-        new_card = deck.deal
-        user.add_card(new_card)
-        user.record_action(actions, 'drew', new_card)
+        user.add_card(get_card)
+        user.record_action(actions, 'drew', get_card)
       elsif answer.start_with?('s')
         user.record_action(actions, 'stays')
         break
@@ -273,7 +270,7 @@ class Game
       sleep(1.5)
       if dealer.total < 17
         new_card = deck.deal
-        dealer.add_card(new_card)
+        dealer.add_card(get_card)
         dealer.record_action(actions, 'drew', new_card)
       else
         dealer.busted? ? dealer.record_action(actions, 'busts') : dealer.record_action(actions, 'stays')
