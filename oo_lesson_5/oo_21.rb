@@ -1,5 +1,11 @@
 require 'pry'
 
+module Clearable
+  def clear
+    system 'clear' or system 'cls'
+  end
+end
+
 module Recordable
 
   def hit_and_record(actions, deck)
@@ -21,6 +27,10 @@ class Deck
   attr_reader :cards
 
   def initialize
+    reset
+  end
+
+  def reset
     @cards = []
     %w(2 3 4 5 6 7 8 9 10 J Q K A).each do |face_value|
       %w(H C D S).each do |suit|
@@ -69,14 +79,28 @@ class Player
   attr_accessor :hand, :name
 
   def initialize
-    @hand = []
+    reset
     get_name
   end
 
-  def show_hand
+  def reset
+    @hand = []
+  end
+
+  def show_hand(show)
     puts "--- #{name}: ---"
-    hand.each do |card|
-      puts "#{card}"
+    if show == :hole
+      hand.each_with_index do |card, index|
+        if hand.size - 1 == index
+          puts '?'
+        else
+          puts "#{card}"
+        end
+      end
+    else
+      hand.each do |card|
+        puts "#{card}"
+      end
     end
     puts "=> Total: #{total}"
     puts ""
@@ -110,6 +134,7 @@ class Player
 end
 
 class User < Player
+  include Clearable
 
   def get_move
     puts 'Do you want to hit or stay?(h/s)'
@@ -122,6 +147,7 @@ class User < Player
   end
 
   def get_name
+    clear
     puts "What's your name?"
     loop do
       @name = gets.chomp
@@ -138,6 +164,7 @@ class Dealer < Player
 end
 
 class Game
+  include Clearable
   attr_accessor :deck, :user, :dealer, :cards, :actions
 
   TWENTYONE = 21
@@ -151,15 +178,25 @@ class Game
   end
 
   def start
+    clear
+    display_welcome_message
     loop do
       game_intro
       game_round
       break unless play_again?
+      reset
     end
     display_goodbye_message
   end
 
   private
+
+  def game_intro
+    puts "Dealing cards..."
+    puts ""
+    sleep(2)
+    deal_initial_hands
+  end
 
   def game_round
     user_turn
@@ -180,6 +217,15 @@ class Game
     answer.start_with?('y')
   end
 
+  def reset
+    deck.reset
+    user.reset
+    dealer.reset
+    @actions = []
+    puts "Ok, let's play again!"
+    puts ""
+  end
+
   def display_welcome_message
     puts "Welcome to Blackjack!"
     puts ""
@@ -192,21 +238,16 @@ class Game
     end
   end
 
-  def display_game_action
+  def display_game_action(show=:hole)
     clear
     actions.each { |action| puts action }
     puts ""
-    show_player_hands
+    show_player_hands(show)
   end
 
-  def show_player_hands
-    user.show_hand
-    dealer.show_hand
-  end
-
-  def hit(player)
-    new_card = deck.deal
-    add_card(new_card)
+  def show_player_hands(show=:hole)
+    user.show_hand(:flop)
+    dealer.show_hand(show)
   end
 
   def user_turn
@@ -238,9 +279,9 @@ class Game
         dealer.busted? ? dealer.record_action(actions, 'busts') : dealer.record_action(actions, 'stays')
         break
       end
-      display_game_action
+      display_game_action(:flop)
     end
-    display_game_action
+    display_game_action(:flop)
   end
 
   def display_goodbye_message
@@ -258,15 +299,6 @@ class Game
     else
       user.total > dealer.total ? :user : :dealer
     end
-  end
-
-  def game_intro
-    clear
-    display_welcome_message
-    puts "Dealing cards..."
-    puts ""
-    sleep(2)
-    deal_initial_hands
   end
 
   def display_result
@@ -287,10 +319,6 @@ class Game
 
   def display_twentyone
     user.total == 21 ? "#{user.name} got a 21!!!" : "#{dealer.name} got a 21!!!"
-  end
-
-  def clear
-    system 'clear' or system 'cls'
   end
 end
 
