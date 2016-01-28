@@ -16,6 +16,7 @@ class Translation
     protein_codon_hsh = build_protein_codon_hsh
     translation = protein_codon_hsh.select { |protein, codons| codons.include?(codon) }.keys.first
     raise InvalidCodonError unless translation
+    translation
   end
 
   def self.of_rna(rna)
@@ -52,15 +53,6 @@ class Translation
   end
 
   def self.translate_proteins(codon_arr)
-    protein_translations = []
-
-    codon_arr.each do |codon|
-      if of_codon(codon)
-        protein_translations << of_codon(codon)
-      end
-    end
-    protein_translations
+    protein_translations = codon_arr.map { |codon| of_codon(codon) }
   end
 end
-
-puts Translation.of_codon('AUG')
