@@ -30,11 +30,8 @@ class Translation
     stop_index = find_stop_index(rna)
     codons = remove_stops(rna, stop_index)
     codon_arr = break_down_codons(codons)
-    if translate_proteins(codon_arr).size == 0
-      raise InvalidCodonError, 'Fix your codon!'
-    else 
-      translate_proteins(codon_arr)
-    end
+    raise InvalidCodonError if translate_proteins(codon_arr).size == 0
+    translate_proteins(codon_arr)
   end
 
   def self.build_protein_codon_hsh
@@ -51,11 +48,7 @@ class Translation
       break if stop_index
       stop_index = rna.index(stop)
     end
-    if stop_index
-      return stop_index
-    else
-      return rna.size
-    end
+    stop_index ? stop_index : rna.size
   end
 
   def self.remove_stops(rna, stop_index)
@@ -63,7 +56,7 @@ class Translation
   end
 
   def self.break_down_codons(codons)
-    codon_arr = []
+    codon_arr = [] #change to codons.scan(/.../)
     start_idx = 0
     end_idx = 2
     (codons.size / CODON_SIZE).times do
@@ -78,10 +71,12 @@ class Translation
     protein_translations = []
 
     codon_arr.each do |codon|
-      if self.of_codon(codon)
-        protein_translations << self.of_codon(codon)
+      if of_codon(codon)
+        protein_translations << of_codon(codon)
       end
     end
     protein_translations
   end
 end
+
+puts Translation.of_rna('AUG')
