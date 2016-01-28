@@ -30,11 +30,12 @@ class Todo
 end
 
 class TodoList 
-  attr_accessor :title
+  attr_accessor :title, :done
 
   def initialize(title)
     @title = title
     @todos = []
+    @done = false
   end
   # rest of class needs implementation
 
@@ -65,6 +66,14 @@ class TodoList
     @todos
   end
 
+  def done!
+    self.done = true
+  end
+
+  def done?
+    self.done == true
+  end
+
   def to_a
     @todos.to_a
   end
@@ -85,7 +94,7 @@ class TodoList
 
   def mark_undone_at(index)
     #@todos[index].undone! # mine
-    item_at(idx).undone! # answer
+    item_at(index).undone! # answer
   end
 
   def shift
