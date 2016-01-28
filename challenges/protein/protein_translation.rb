@@ -56,15 +56,7 @@ class Translation
   end
 
   def self.break_down_codons(codons)
-    codon_arr = [] #change to codons.scan(/.../)
-    start_idx = 0
-    end_idx = 2
-    (codons.size / CODON_SIZE).times do
-      codon_arr << codons[start_idx..end_idx]
-      start_idx += 3
-      end_idx += 3
-    end
-    codon_arr
+    codon_arr = codons.scan(/.../)
   end
 
   def self.translate_proteins(codon_arr)
@@ -79,4 +71,4 @@ class Translation
   end
 end
 
-puts Translation.of_rna('AUG')
+#puts Translation.of_codon('AUG')
