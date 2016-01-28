@@ -12,18 +12,10 @@ class Translation
                 Leucine Serine Tyrosine Cysteine 
                 Tryptophan STOP)
 
-  def self.of_codon(rna)
+  def self.of_codon(codon)
     protein_codon_hsh = build_protein_codon_hsh
-    match = nil
-    protein_codon_hsh.each do |key, value|
-      value.each do |codon|
-        if codon == rna
-          match = key
-          break
-        end
-      end
-    end
-    match
+    translation = protein_codon_hsh.select { |protein, codons| codons.include?(codon) }
+    translation.keys.first 
   end
 
   def self.of_rna(rna)
@@ -71,4 +63,4 @@ class Translation
   end
 end
 
-#puts Translation.of_codon('AUG')
+puts Translation.of_codon('AUG')
