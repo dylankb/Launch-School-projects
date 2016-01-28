@@ -1,4 +1,5 @@
-require 'pry'
+class InvalidCodonError < StandardError
+end
 
 class Translation
   CODON_SIZE = 3
@@ -30,7 +31,7 @@ class Translation
     codons = remove_stops(rna, stop_index)
     codon_arr = break_down_codons(codons)
     if translate_proteins(codon_arr).size == 0
-      raise "InvalidCodonError"
+      raise InvalidCodonError, 'Fix your codon!'
     else 
       translate_proteins(codon_arr)
     end
@@ -84,4 +85,3 @@ class Translation
     protein_translations
   end
 end
-
