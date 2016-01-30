@@ -11,9 +11,7 @@ class School
   end
 
   def to_h
-    output = []
     school.each do |grade|
-      output << grade
       yield(grade) if block_given?
     end
   end
