@@ -15,6 +15,7 @@ class School
     school.each do |grade|
       yield(grade) if block_given?
     end
+    school.values.map(&:sort!)
     school.sort.to_h
   end
 
