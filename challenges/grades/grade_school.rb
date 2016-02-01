@@ -1,4 +1,3 @@
-require 'pry'
 class School
   attr_reader :school
 
