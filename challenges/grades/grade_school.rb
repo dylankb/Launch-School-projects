@@ -1,3 +1,4 @@
+require 'pry'
 class School
   attr_reader :school
 
@@ -14,6 +15,7 @@ class School
     school.each do |grade|
       yield(grade) if block_given?
     end
+    school.sort.to_h
   end
 
   def grade(grade)
