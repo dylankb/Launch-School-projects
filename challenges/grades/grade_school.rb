@@ -11,9 +11,6 @@ class School
   end
 
   def to_h
-    school.each do |grade|
-      yield(grade) if block_given?
-    end
     school.values.map(&:sort!)
     school.sort.to_h
   end
@@ -22,3 +19,10 @@ class School
     school.fetch(grade, Array.new) 
   end
 end
+
+school = School.new
+school.add('Aimee', 6)
+school.add('Aimee', 2)
+school.add('John', 2)
+school.add('John', 3)
+p school.to_h
