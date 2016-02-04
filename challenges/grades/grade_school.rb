@@ -1,28 +1,20 @@
 class School
-  attr_reader :school
+  attr_reader :roster
 
   def initialize
-    @school = {}
+    @roster = {}
   end
 
-  def add(name, grade)
-    new_student = {grade => [name]}
-    school.merge!(new_student) {|key, oldval, newval| oldval << newval[0]}
+  def add(name, _grade)
+    roster[_grade] = grades(_grade) << name
   end
 
   def to_h
-    school.values.map(&:sort!)
-    school.sort.to_h
+    roster.values.map(&:sort!)
+    roster.sort.to_h
   end
 
-  def grade(grade)
-    school.fetch(grade, Array.new) 
+  def grades(_grade)
+    roster.fetch(_grade, Array.new) 
   end
 end
-
-school = School.new
-school.add('Aimee', 6)
-school.add('Aimee', 2)
-school.add('John', 2)
-school.add('John', 3)
-p school.to_h
