@@ -1,21 +1,51 @@
-def select(array)
+## My Implementation ##
 
-  result = []
-  counter = 0
+# def select(arr)
+#   counter = 0
+#   output = []
 
-  while counter < array.size
-    current_element = array[counter]
-    result << current_element if yield(current_element)
+#   while counter < arr.size
+#     if yield(arr[counter])
+#       output << arr[counter]
+#     end
+#     counter += 1
+#   end
+#   output
+# end
 
-    counter += 1
+## Solution ###
 
-  end
-  result
+# def select(array)
+
+#   result = []
+#   counter = 0
+
+#   while counter < array.size
+#     current_element = array[counter]
+#     result << current_element if yield(current_element)
+
+#     counter += 1
+
+#   end
+#   result
+# end
+
+result = [1,2,3].select do |num|
+  true
 end
+p result
 
-array = [1,2,3]
+result = [1,2,3].select do |num|
+  0
+end
+puts "-- 2 --"
+p result
 
-p select(array) { |element| element.odd? }
+result = [1,2,3].select do |num|
+  num > 2
+  puts true
+end
+p result
 
-# Yield calls .odd? on the current element
-# When yield is called it's calling the block with a parameter. The parameterpassed in to the block is .odd?
+result = [1,2,3].select
+p result
