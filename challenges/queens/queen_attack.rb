@@ -1,8 +1,5 @@
-require 'pry'
-
 class Queens
-  attr_reader :white, :black, :positions
-  attr_accessor :board
+  attr_reader :white, :black, :positions, :board
 
   ROW = (0..7).to_a
   COLUMN = (0..7).to_a
@@ -17,22 +14,22 @@ class Queens
   end
 
   def attack?
-    white_straights = get_straights(white)
-    white_diagonals = get_diagonals(white)# + get_dip_diagonals(white)
-    white_moves = (white_straights + white_diagonals).delete_if {|arr| arr == white }
-
-    black_straights = get_straights(black)
-    black_diagonals = get_diagonals(black)# + get_dip_diagonals(black)
-    black_moves = (black_straights + black_diagonals).delete_if {|arr| arr == black}
-
+    white_moves = get_queen_moves(white)
+    black_moves = get_queen_moves(black)
     white_moves.include?(black) && black_moves.include?(white)
   end
 
   def to_s
     mark_queen_locations
-    output = @board.map { |arr| ['W','B'].include?(arr) ? arr : '-' }
-    @board = output.each_slice(8).to_a
+    @board.map! { |arr| ['W','B'].include?(arr) ? arr : '_' }
+    @board = @board.each_slice(8).to_a
     @board.map { |row| row.join(' ') }.join("\n")
+  end
+
+  def get_queen_moves(queen)
+    straight_moves = get_straights(queen)
+    diagonal_moves = get_diagonals(queen)
+    (straight_moves + diagonal_moves).delete_if {|arr| arr == queen }
   end
 
   def mark_queen_locations
@@ -46,8 +43,8 @@ class Queens
 
   def get_diagonals(queen)
     queen_moves = []
+    
     queen_copy = queen.dup
-
     while queen_copy[0] < 7 && queen_copy[1] < 7
       queen_moves << [ queen_copy[0] += 1, queen_copy[1] += 1]
     end
@@ -66,9 +63,7 @@ class Queens
     while queen_copy4[0] < 7 && queen_copy4[1] > 0
       queen_moves << [ queen_copy4[0] += 1, queen_copy4[1] -= 1]
     end
+
     queen_moves
   end
 end
-
-queens = Queens.new
-puts queens

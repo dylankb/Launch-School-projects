@@ -9,7 +9,7 @@ class QueensTest < Minitest::Test
   end
 
   def test_specific_placement
-    skip
+    
     queens = Queens.new(white: [3, 7], black: [6, 1])
     assert_equal [3, 7], queens.white
     assert_equal [6, 1], queens.black
@@ -49,7 +49,7 @@ _ _ _ _ _ _ _ _
   end
 
   def test_another_string_representation
-    skip
+    
     queens = Queens.new(white: [7, 1], black: [0, 0])
     board = <<-BOARD.chomp
 B _ _ _ _ _ _ _
@@ -65,7 +65,7 @@ _ W _ _ _ _ _ _
   end
 
   def test_yet_another_string_representation
-    skip
+    
     queens = Queens.new(white: [4, 3], black: [3, 4])
     board = <<-BOARD.chomp
 _ _ _ _ _ _ _ _
