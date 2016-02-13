@@ -1,11 +1,3 @@
-# Date.new(2001,2,3).cwday          #=> 6
-
-# d.strftime('%a %d %b %Y')    #=> "Sun 04 Feb 2001"
-
-# Date.new(2001,2,3).mday           #=> 3
-
-# monday? → bool
-# Returns true if the date is Monday.
 require 'date'
 
 class Meetup
