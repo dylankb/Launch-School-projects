@@ -8,7 +8,8 @@ class Meetup
                 teenth: 13, 
                 third: 15, 
                 fourth: 22, 
-                last: -7 }
+                last: -7 
+              }
 
   def initialize(month, year)
     @month = month
