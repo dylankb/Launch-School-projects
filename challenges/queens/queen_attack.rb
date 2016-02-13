@@ -45,7 +45,7 @@ class Queens
     queen_moves = []
     
     queen_copy = queen.dup
-    while queen_copy[0] < 7 && queen_copy[1] < 7
+    while queen_copy.dup.max
       queen_moves << [ queen_copy[0] += 1, queen_copy[1] += 1]
     end
 

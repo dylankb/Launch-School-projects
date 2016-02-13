@@ -6,7 +6,7 @@ class School
   end
 
   def add(name, _grade)
-    roster[_grade] = grades(_grade) << name
+    roster[_grade] = grade(_grade) << name
   end
 
   def to_h
@@ -14,7 +14,7 @@ class School
     roster.sort.to_h
   end
 
-  def grades(_grade)
+  def grade(_grade)
     roster.fetch(_grade, Array.new) 
   end
 end
