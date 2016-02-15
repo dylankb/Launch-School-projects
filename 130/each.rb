@@ -21,6 +21,3 @@
 
 # p test
 
-queen = Queens.new
-queens.to_s
-

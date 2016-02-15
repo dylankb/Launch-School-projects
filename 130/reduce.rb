@@ -10,7 +10,7 @@
 #   sum
 # end
 
-array = [1, 2, 3, 4, 5]
+# array = [1, 2, 3, 4, 5]
 
 puts reduce(array, 10) { |acc, num| acc + num }  
 puts reduce(array, 10) { |acc, num| puts "Hello" }  
