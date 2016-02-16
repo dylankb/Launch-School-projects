@@ -1,10 +1,8 @@
 require 'socket'
-require 'pry'
 
 def url_parser(request_line)  
   http_method, path_and_param, http = request_line.split(' ')
   path, params = path_and_param.split('?')
- # binding.pry
   params = ( params || "").split('&').each_with_object({}) do |pair, hash|
     key, value = pair.split("=")
     hash[key] = value

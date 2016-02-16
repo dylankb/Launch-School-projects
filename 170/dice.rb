@@ -1,7 +1,6 @@
 require 'socket'
-require 'pry'
 
-def url_parser(request_line)  
+def url_parser(request_line)  #/?rolls=2&sides=6
   http_method, path_and_param, http = request_line.split(' ')
   path, params = path_and_param.split('?')
   binding.pry
@@ -12,9 +11,6 @@ def url_parser(request_line)
   [http_method, path, params]
 end
 
-  #/?rolls=2&sides=6
-  #https://amazon.com/Double-Stainless-Commercial-Refrigerator/B60HON32?ie=UTF8&qid=142952676&sr=93&keywords=commercial+fridge
-server = TCPServer.new("localhost", 3003)
 loop do
   client = server.accept
 
