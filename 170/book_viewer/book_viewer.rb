@@ -9,7 +9,7 @@ get "/" do
 end
 
 get "/chapters/1" do
-  @ch1 = File.read('data/chp1.txt')
+  @chapter = File.read('data/chp1.txt')
   @contents = File.readlines('data/toc.txt')
   erb :chapter
 end
