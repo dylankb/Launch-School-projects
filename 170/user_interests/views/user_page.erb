@@ -1,0 +1,13 @@
+<% name = params[:name].to_sym %>
+
+<p>Email: <%= USERS[name][:email] %></p>
+
+<p>Interests: <%= USERS[name][:interests].join(', ') %></p>
+
+<% (USERS.keys - [name]).each do |_name| %>
+  <p><%= "<a href='/user/#{_name}'>#{_name}</a>" %></p>
+<% end %>
+
+
+
+ 
