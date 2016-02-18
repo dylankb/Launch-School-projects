@@ -1,6 +1,7 @@
 require "sinatra"
 require "sinatra/reloader"
 require 'tilt/erubis'
+require 'pry'
 
 before do
   @contents = File.readlines('data/toc.txt')
@@ -29,5 +30,27 @@ get "/chapters/:number" do
   @chapter = File.read("data/chp#{params['number']}.txt")
 
   erb :chapter
+end
+
+get "/search" do
+
+  if params[:query]
+    @results = []
+    @contents.each_with_index do |title, index|
+      @chapter = File.read("data/chp#{index + 1}.txt")
+      if @chapter.include?(params[:query])
+        @results << "<a href='/chapters/#{index + 1}'>#{title}</a>" 
+        @paragraphs = @chapter.split(/\n\n/).select do |paragraph|
+          paragraph.include?(params[:query])
+        end
+      end
+    end
+  end
+
+  erb :search
+end
+
+not_found do
+  redirect "/"
 end
 
