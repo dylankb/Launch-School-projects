@@ -1,19 +1,22 @@
+require 'pry'
+
 class PhoneNumber
 
+  ERROR_NUMBER = '0000000000'
+
   def initialize(number)
-    @number_string = number
+    @number = number
+    @number = has_alpha_characters? ? ERROR_NUMBER : number.scan(/\d/).join
   end
 
   def number
-    return '0000000000' if has_alphabetic_characters?
-    numbers = @number_string.scan(/\d/).join
-    numbers.slice!(0,1) if numbers[0] == '1' && numbers.size == 11
-    return '0000000000' unless numbers.size == 10
-    numbers    
+    @number.slice!(0,1) if @number[0] == '1' && @number.size == 11
+    return '0000000000' unless @number.size == 10
+    @number    
   end
 
-  def has_alphabetic_characters?
-    @number_string.scan(/[a-z]/).size != 0
+  def has_alpha_characters?
+    @number.scan(/[a-z]/).size != 0
   end
 
   def area_code
