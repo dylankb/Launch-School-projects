@@ -1,5 +1,3 @@
-require 'pry'
-
 class PhoneNumber
 
   ERROR_NUMBER = '0000000000'
@@ -11,7 +9,7 @@ class PhoneNumber
 
   def number
     @number.slice!(0,1) if @number[0] == '1' && @number.size == 11
-    return '0000000000' unless @number.size == 10
+    return ERROR_NUMBER unless @number.size == 10
     @number    
   end
 
@@ -35,8 +33,6 @@ class PhoneNumber
     "(#{area_code}) #{central_office_code}-#{line_code}"
   end
 end
-
-puts PhoneNumber.new('9876543210').to_s
 
 
 
