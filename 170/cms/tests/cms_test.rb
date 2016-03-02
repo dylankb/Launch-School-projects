@@ -24,6 +24,7 @@ class AppTest < Minitest::Test
 
   def test_index_contents
     get "/index.txt"
+    get "/data/index.txt"
     assert_equal 200, last_response.status
     assert_equal "text/plain", last_response["Content-Type"]
     assert_includes last_response.body, "1993 - Yukihiro Matsumoto dreams up Ruby."  

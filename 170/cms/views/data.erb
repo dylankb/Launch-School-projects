@@ -1,3 +1,4 @@
+
 <% if session[:message] %>
   <p><%= session.delete(:message) %></p>
 <% end %>
@@ -5,5 +6,8 @@
 <ul>
   <% @data.each do |file| %>
     <li><a href="/<%= file %>"><%= file %></li>
+    <li>
+      <a href="/<%= file %>"> <%= file %> </a>
+    </li>
   <% end %>
 </ul>
