@@ -5,17 +5,31 @@ require 'pry'
 
 root = File.expand_path("..", __FILE__)
 
-get "/" do 
+helpers do
+  def load_file(file)
+    if !@data.include?(file)
+      redirect "/:error"
+    else
+      file
+    end
+  end
+end
+
+get "/" do
   "Getting started"
   @data = Dir.glob(root + '/data/*').map { |file| File.basename(file)}.sort
 
   erb :data
 end
 
-get "/data/:filename" do
-
+get "/:filename" do
   file_path = root + "/data/" + params[:filename]
-  headers["Content-Type"] = "text/plain"
-  
-  File.read(file_path)
+
+  if File.exist?(file_path)
+    headers["Content-Type"] = "text/plain"
+    File.read(file_path)
+  else
+    session[:message] = "#{params[:filename]} does not exist."
+    redirect "/"
+  end
 end
