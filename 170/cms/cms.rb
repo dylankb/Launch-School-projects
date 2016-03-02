@@ -5,16 +5,6 @@ require 'pry'
 
 root = File.expand_path("..", __FILE__)
 
-helpers do
-  def load_file(file)
-    if !@data.include?(file)
-      redirect "/:error"
-    else
-      file
-    end
-  end
-end
-
 get "/" do
   "Getting started"
   @data = Dir.glob(root + '/data/*').map { |file| File.basename(file)}.sort
