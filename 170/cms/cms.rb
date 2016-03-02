@@ -10,10 +10,21 @@ configure do
   set :session_secret, 'secret'
 end
 
-helpers do
-  def render_markdown(file)
-    markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
-    markdown.render(file)
+def render_markdown(file)
+  markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
+  markdown.render(file)
+end
+
+def load_file(file_path)
+  ext = File.extname(file_path)
+
+  case ext
+  when ".md"
+    file = File.read(file_path)
+    render_markdown(file)
+  when ".txt"
+    headers["Content-Type"] = "text/plain"
+    File.read(file_path)
   end
 end
 
@@ -28,13 +39,7 @@ get "/:filename" do
   file_path = root + "/data/" + params[:filename]
 
   if File.exist?(file_path)
-    if File.extname(file_path) == ".md"
-      file = File.read(file_path)
-      render_markdown(file)
-    else
-      headers["Content-Type"] = "text/plain"
-      File.read(file_path)
-    end
+    load_file(file_path)
   else
     session[:message] = "#{params[:filename]} does not exist."
     redirect "/"
