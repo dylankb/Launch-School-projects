@@ -15,7 +15,21 @@ def render_markdown(file)
   markdown.render(file)
 end
 
-def load_file(file_path)
+def create_document(name, content = "")
+  File.open(File.join(data_path, name), "w") do |file|
+    file.write(content)
+  end
+end
+
+def data_path
+  if ENV["RACK_ENV"] == "test"
+    File.expand_path("../test/data", __FILE__)
+  else
+    File.expand_path("../data", __FILE__)
+  end
+end
+
+def load_file_contents(file_path)
   ext = File.extname(file_path)
 
   case ext
@@ -29,17 +43,19 @@ def load_file(file_path)
 end
 
 get "/" do
-  "Getting started"
-  @data = Dir.glob(root + '/data/*').map { |file| File.basename(file)}.sort
+  pattern = File.join(data_path, "*")
+  @files = Dir.glob(pattern).map do |file| 
+    File.basename(file)
+  end
 
   erb :data
 end
 
 get "/:filename" do
-  file_path = root + "/data/" + params[:filename]
+  file_path = File.join(data_path, params[:filename])
 
   if File.exist?(file_path)
-    load_file(file_path)
+    load_file_contents(file_path)
   else
     session[:message] = "#{params[:filename]} does not exist."
     redirect "/"
@@ -47,7 +63,7 @@ get "/:filename" do
 end
 
 get "/:filename/edit" do
-  file_path = root + "/data/" + params[:filename]
+  file_path = File.join(data_path, params[:filename])
 
   if File.exist?(file_path)
     @content = File.read(file_path)
@@ -61,11 +77,10 @@ get "/:filename/edit" do
 end
 
 post "/:filename" do
-  file_path = root + "/data/" + params[:filename]
+  file_path = File.join(data_path, params[:filename])
 
   File.write(file_path, params[:file_edit])
 
   session[:message] = "#{File.basename(file_path)} was edited!"
   redirect "/"
-
 end
