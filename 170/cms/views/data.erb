@@ -3,10 +3,17 @@
   <p><%= session.delete(:message) %></p>
 <% end %>
 
-<ul>
-  <% @data.each do |file| %>
-    <li>
-      <a href="/<%= file %>"> <%= file %> </a>
-    </li>
-  <% end %>
-</ul>
+<table>
+  <ul>
+    <% @data.each do |file| %>
+      <tr>
+        <td>
+          <a href="/<%= file %>"> <%= file %> </a>
+        </td>
+        <td>
+          <a href="/<%= file %>/edit">Edit</a>
+        </td>
+      </tr>
+    <% end %>
+  </ul>
+</table>

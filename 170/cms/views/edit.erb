@@ -1,0 +1,19 @@
+<div>
+
+  <form action="/<%= @filename %>" method="post">
+    <dl>
+      <dt>
+        <label for="file_edit"> Edit your file:</label>
+      </dt>
+      <div>
+        <textarea row="20" cols="100" name="file_edit"> <%= @content %></textarea>
+      </div>
+        </br>
+        </br>
+        <input type="submit" value="Save">
+        <button><a href="/">Cancel</a></button>
+      </dd>
+    </dl>
+  </form>
+
+</div>
