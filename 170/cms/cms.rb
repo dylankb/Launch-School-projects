@@ -30,15 +30,14 @@ def data_path
 end
 
 def load_file_contents(file_path)
-  ext = File.extname(file_path)
+  content = File.read(file_path)
 
-  case ext
+  case File.extname(file_path)
   when ".md"
-    file = File.read(file_path)
-    render_markdown(file)
+    erb render_markdown(content)
   when ".txt"
     headers["Content-Type"] = "text/plain"
-    File.read(file_path)
+    content
   end
 end
 
