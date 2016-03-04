@@ -95,4 +95,20 @@ class AppTest < Minitest::Test
     assert_equal 200, last_response.status
     assert_includes last_response.body, "newer content!"
   end
+
+  def test_create_document
+    post "/create", filename: "testfile.txt"
+
+    assert_equal 302, last_response.status
+
+    get last_response["Location"] #get "/"
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "testfile.txt has been created."
+
+    get "/testfile.txt"
+
+    assert_equal 200, last_response.status
+  end
+
 end
