@@ -1,14 +1,18 @@
-<table>
-  <ul>
-    <% @files.each do |file| %>
-      <tr>
-        <td>
-          <a href="/<%= file %>"> <%= file %> </a>
-        </td>
-        <td>
-          <a href="/<%= file %>/edit">Edit</a>
-        </td>
-      </tr>
-    <% end %>
-  </ul>
-</table>
+<html>
+  <table>
+    <ul>
+      <% @files.each do |file| %>
+        <tr>
+          <td>
+            <href="/<%= file %>"> <%= file %> </a>
+          </td>
+          <td>
+            <a href="/<%= file %>/edit">Edit</a>
+          </td>
+        </tr>
+      <% end %>
+    </ul>
+  </table>
+  <p>
+    <a href="/new">New Document</a>
+</html>
