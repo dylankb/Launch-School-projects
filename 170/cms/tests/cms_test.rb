@@ -111,4 +111,17 @@ class AppTest < Minitest::Test
     assert_equal 200, last_response.status
   end
 
+  def test_delete_document
+    create_document("testfile.txt")
+
+    post "/testfile.txt/delete"
+
+    assert_equal 302, last_response.status
+
+    get last_response["Location"] #get "/"
+    assert_includes last_response.body, "testfile.txt was deleted!"
+
+    get "/testfile.txt"
+    refute_includes last_response.body, "test.txt"
+  end
 end
