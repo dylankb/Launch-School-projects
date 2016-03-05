@@ -33,39 +33,11 @@ class Palindromes
   end
 
   def is_palindrome?(num)
-    digits = num.to_s.chars.length
-    return true if digits == 1
-
-    stop = (digits - 1)
-    start = 0
-    (digits / 2).times do
-      if num.to_s[start] == num.to_s[stop]
-        start += 1
-        stop -= 1
-      else
-        return false
-      end
-    end
-    true
+    num.to_s == num.to_s.reverse
   end
 end   
 
 palindromes = Palindromes.new(max_factor: 99, min_factor: 10)
 palindromes.generate
 largest = palindromes.largest
-p largest.value
 
-
-
-
-
-# max = 99
-# min = 10
-# a = (min..max).to_a
-# perms = a.repeated_permutation(2).to_a
-
-# products = perms.each_with_object({}) do |num, acc|
-#   acc.merge!(Hash[ num[0] * num[1], [ num[0], num[1] ] ])
-# end
-
-# p products.keys.include? 9009
