@@ -15,3 +15,8 @@ body {
 #signin {
   float: right;
 }
+
+.user-status {
+  font-style: italic;
+  font-size: 0.9em;
+}

@@ -2,13 +2,13 @@
   <body>
     <div id="signin">
       <% if session[:username] %>
-        <p class="inline">You are signed in as <%= session[:username]%></p>
+        <p class="user-status">You are signed in as <%= session[:username]%></p>
       <% else %>
         <button>
           <a href="/signin"> Sign In</a>
         </button>
       <% end %>
-        <form class="inline" action="signout" method="post">
+        <form class="inline" action="/signout" method="post">
           <button input="submit">Sign Out</button>
         </form>
     </div>
