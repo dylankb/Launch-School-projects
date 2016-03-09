@@ -124,4 +124,36 @@ class AppTest < Minitest::Test
     get "/testfile.txt"
     refute_includes last_response.body, "test.txt"
   end
+
+  def test_signin_with_good_credentials
+    post "/checkid", username: "admin", password: "secret"
+
+    assert_equal 302, last_response.status
+    get last_response["Location"]
+
+    assert_includes last_response.body, "You signed in!"
+    assert_includes last_response.body, "You are signed in as admin"
+  end
+
+  def test_signin_with_bad_credentials
+    post "/checkid", username: "badger", password: "badger"
+
+    assert_equal 422, last_response.status
+
+    assert_includes last_response.body, "Invalid credentials"
+  end
+
+  def test_signout
+    post "/checkid", username: "admin", password: "secret"
+    
+    post "/signout"
+    assert_equal 302, last_response.status
+
+    get last_response["Location"]
+
+    assert_includes last_response.body, "You have been signed out."
+  end
+
+
+
 end

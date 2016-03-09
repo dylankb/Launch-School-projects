@@ -11,3 +11,7 @@ body {
 .inline {
   display: inline;
 }
+
+#signin {
+  float: right;
+}

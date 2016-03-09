@@ -1,0 +1,38 @@
+<html>
+  <body>
+    <div id="signin">
+      <% if session[:username] %>
+        <p class="inline">You are signed in as <%= session[:username]%></p>
+      <% else %>
+        <button>
+          <a href="/signin"> Sign In</a>
+        </button>
+      <% end %>
+        <form class="inline" action="signout" method="post">
+          <button input="submit">Sign Out</button>
+        </form>
+    </div>
+    <table>
+      <ul>
+        <% @files.each do |file| %>
+          <tr>
+            <td>
+              <href="/<%= file %>"> <%= file %> </a>
+            </td>
+            <td>
+              <a href="/<%= file %>/edit">Edit</a>
+            </td>
+            <td>
+              <form class="inline" method="post" action="/<%= file %>/delete">
+                <button type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% end %>
+      </ul>
+    </table>
+    <p>
+      <a href="/new">New Document</a>
+    </p>
+  </body>
+</html>
