@@ -125,6 +125,14 @@ class AppTest < Minitest::Test
     refute_includes last_response.body, "test.txt"
   end
 
+  def test_signin_form
+    get "/signin"
+
+    assert_equal 200, last_response.status
+
+    assert_includes last_response.body, %q(button type="submit")
+  end
+
   def test_signin_with_good_credentials
     post "/checkid", username: "admin", password: "secret"
 
