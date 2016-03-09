@@ -164,7 +164,6 @@ class AppTest < Minitest::Test
     post "/checkid", username: "badger", password: "badger"
 
     assert_equal 422, last_response.status
-    assert_equal "Invalid credentials", session[:message]
-    #assert_includes last_response.body, "Invalid credentials"
+    assert_includes last_response.body, "Invalid credentials"
   end
 end

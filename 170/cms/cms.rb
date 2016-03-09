@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra/reloader'
 require "tilt/erubis"
 require "redcarpet"
+require 'yaml'
 
 root = File.expand_path("..", __FILE__)
 
@@ -29,6 +30,15 @@ def data_path
   end
 end
 
+def load_user_credentials
+  credentials_path = if ENV["RACK_ENV"] == "test"
+    File.expand_path("../test/users.yml", __FILE__)
+  else
+    File.expand_path("../users.yml", __FILE__)
+  end
+  YAML.load_file(credentials_path)
+end
+
 def load_file_contents(file_path)
   content = File.read(file_path)
 
@@ -42,11 +52,16 @@ def load_file_contents(file_path)
 end
 
 def correct_id?(username, password)
-  username == "admin" && password == "secret"
+  credentials = load_user_credentials
+  credentials.include?(username) && credentials[username] == password
 end
 
 def signed_in?
-  if !session[:username]
+  session[:username]
+end
+
+def require_signin
+  if !signed_in?
     session[:message] = "You must be signed in to do that"
     redirect "/"
   end
@@ -86,14 +101,13 @@ post "/signout" do
 end
 
 get "/new" do
-  signed_in?
-
+  require_signin
 
   erb :new
 end
 
 post "/create" do
-  signed_in?
+  require_signin
   
   filename = params[:filename].to_s
 
@@ -123,7 +137,7 @@ get "/:filename" do
 end
 
 get "/:filename/edit" do
-  signed_in?
+  require_signin
 
   file_path = File.join(data_path, params[:filename])
 
