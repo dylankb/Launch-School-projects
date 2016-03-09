@@ -25,6 +25,22 @@ class AppTest < Minitest::Test
     last_request.env["rack.session"]
   end
 
+  def admin_session
+    { "rack.session" => { username: "admin" } }
+  end
+
+  def test_signout
+    get "/", {}, admin_session
+    assert_includes last_response.body, "You are signed in as admin"
+    
+    post "/signout"
+    get last_response["Location"]
+
+    assert_equal nil, session[:username]
+    assert_includes last_response.body, "You have been signed out"
+    assert_includes last_response.body, "Sign In"
+  end
+
   def test_index
     create_document "about.md"
     create_document "home.txt"
@@ -63,26 +79,35 @@ class AppTest < Minitest::Test
     assert_includes last_response.body, "<strong>Markdown</strong>"
   end
 
-  def test_editing_document
-    create_document "home.txt", %q(<input type="submit" value="Save">)
+  def test_editing_document_page
+    create_document "home.txt"
 
-    get "/home.txt/edit"
+    get "/home.txt/edit", {}, admin_session
 
     assert_equal 200, last_response.status
     assert_includes last_response.body, %q(<input type="submit" value="Save">)
   end
 
+  def test_editing_document_page_signed_out
+    create_document "home.txt"
+
+    get "/home.txt/edit"
+
+    assert_equal 302, last_response.status
+    assert_includes "You must be signed in to do that", session[:message]
+  end
+
   def test_making_edits
     create_document "/home.txt", "new stuff!"
 
-    get "/home.txt/edit"
+    get "/home.txt/edit", {}, admin_session
 
     assert_equal 200, last_response.status
     assert_includes last_response.body, "new stuff!"
   end
 
   def test_updating_document
-    post "/home.txt", file_edit: "newer content!"
+    post "/home.txt", {file_edit: "newer content!"}, admin_session
 
     assert_equal 302, last_response.status
     assert_equal "home.txt was edited!", session[:message]
@@ -94,7 +119,7 @@ class AppTest < Minitest::Test
   end
 
   def test_create_document
-    post "/create", filename: "testfile.txt"
+    post "/create", {filename: "testfile.txt"}, admin_session
 
     assert_equal 302, last_response.status
     assert_equal "testfile.txt has been created.", session[:message]
@@ -139,19 +164,7 @@ class AppTest < Minitest::Test
     post "/checkid", username: "badger", password: "badger"
 
     assert_equal 422, last_response.status
-    assert_includes last_response.body, "Invalid credentials"
-  end
-
-  def test_signout
-    get "/", {}, { "rack.session" => { username: "admin" } }
-    assert_includes last_response.body, "You are signed in as admin"
-    
-    post "/signout"
-    get last_response["Location"]
-
-    assert_equal nil, session[:username]
-    assert_includes last_response.body, "You have been signed out"
-    assert_includes last_response.body, "Sign In"
-    
+    assert_equal "Invalid credentials", session[:message]
+    #assert_includes last_response.body, "Invalid credentials"
   end
 end

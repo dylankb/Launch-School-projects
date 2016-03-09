@@ -45,6 +45,13 @@ def correct_id?(username, password)
   username == "admin" && password == "secret"
 end
 
+def signed_in?
+  if !session[:username]
+    session[:message] = "You must be signed in to do that"
+    redirect "/"
+  end
+end
+
 get "/" do
   pattern = File.join(data_path, "*")
   @files = Dir.glob(pattern).map do |file| 
@@ -79,11 +86,14 @@ post "/signout" do
 end
 
 get "/new" do
+  signed_in?
+
 
   erb :new
 end
 
 post "/create" do
+  signed_in?
   
   filename = params[:filename].to_s
 
@@ -113,6 +123,8 @@ get "/:filename" do
 end
 
 get "/:filename/edit" do
+  signed_in?
+
   file_path = File.join(data_path, params[:filename])
 
   if File.exist?(file_path)
