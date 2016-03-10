@@ -46,7 +46,7 @@ def load_file_contents(file_path)
   case File.extname(file_path)
   when ".md"
     erb render_markdown(content)
-  when ".txt"
+  else ".txt"
     headers["Content-Type"] = "text/plain"
     content
   end
@@ -69,6 +69,17 @@ end
 def require_signin
   if !signed_in?
     session[:message] = "You must be signed in to do that"
+    redirect "/"
+  end
+end
+
+get "/view" do
+  file_path = File.join(data_path, params[:filename])
+  
+  if File.exist?(file_path)
+    load_file_contents(file_path)
+  else
+    session[:message] = "#{params[:filename]} does not exist."
     redirect "/"
   end
 end
