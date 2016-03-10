@@ -3,6 +3,7 @@ require 'sinatra/reloader'
 require "tilt/erubis"
 require "redcarpet"
 require 'yaml'
+require 'bcrypt'
 
 root = File.expand_path("..", __FILE__)
 
@@ -53,7 +54,12 @@ end
 
 def correct_id?(username, password)
   credentials = load_user_credentials
-  credentials.include?(username) && credentials[username] == password
+  if credentials.key?(username)
+    bcrypt_password = BCrypt::Password.create(password)
+    bcrypt_password == password
+  else
+    false
+  end
 end
 
 def signed_in?
@@ -76,15 +82,17 @@ get "/" do
   erb :index
 end
 
-get "/signin" do
+get "/users/signin" do
   erb :signin
 end
 
-post "/checkid" do
-  if correct_id?(params[:username], params[:password])
+post "/users/signin" do
+  username = params[:username]
+
+  if correct_id?(username, params[:password])
     session[:message] = "You signed in!"
-    session[:username] = params[:username]
-    
+    session[:username] = username
+
     redirect "/"
   else
     session[:message] = "Invalid credentials"
@@ -93,7 +101,7 @@ post "/checkid" do
   end
 end
 
-post "/signout" do
+post "/users/signout" do
   session[:username] = nil
   session[:message] = "You have been signed out."
 

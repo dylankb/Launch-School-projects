@@ -3,6 +3,7 @@ ENV["RACK_ENV"] = "test"
 require "minitest/autorun"
 require "rack/test"
 require "fileutils"
+require 'pry'
 
 require_relative "../cms"
 
@@ -33,7 +34,7 @@ class AppTest < Minitest::Test
     get "/", {}, admin_session
     assert_includes last_response.body, "You are signed in as admin"
     
-    post "/signout"
+    post "/users/signout"
     get last_response["Location"]
 
     assert_equal nil, session[:username]
@@ -142,7 +143,7 @@ class AppTest < Minitest::Test
   end
 
   def test_signin_form
-    get "/signin"
+    get "/users/signin"
 
     assert_equal 200, last_response.status
 
@@ -150,7 +151,7 @@ class AppTest < Minitest::Test
   end
 
   def test_signin_with_good_credentials
-    post "/checkid", username: "admin", password: "secret"
+    post "/users/signin", username: "admin", password: "secret"
 
     assert_equal 302, last_response.status
     assert_equal "You signed in!", session[:message]
@@ -161,7 +162,7 @@ class AppTest < Minitest::Test
   end
 
   def test_signin_with_bad_credentials
-    post "/checkid", username: "badger", password: "badger"
+    post "/users/signin", username: "badger", password: "badger"
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Invalid credentials"
