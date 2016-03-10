@@ -74,7 +74,7 @@ def require_signin
 end
 
 get "/view" do
-  file_path = File.join(data_path, params[:filename])
+  file_path = File.join(data_path, File.basename(params[:filename]))
   
   if File.exist?(file_path)
     load_file_contents(file_path)
