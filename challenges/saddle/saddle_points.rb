@@ -4,17 +4,12 @@ class Matrix
     @points = points
   end
 
-  def format_points
-    s_points = @points.split("\n")
-    s_points.map { |string| string.split(" ").map(&:to_i) }
-  end
-
   def rows
-    format_points
+    matrix_string_to_matrix_array
   end
 
   def columns
-    format_points.transpose
+    matrix_string_to_matrix_array.transpose
   end
 
   def saddle_points
@@ -24,6 +19,12 @@ class Matrix
     row_maxs.each_with_object([]).with_index do |(num, obj), index|
       obj << [index, col_mins.find_index(num)] if col_mins.include?(num)
     end
-
   end
+
+  private
+
+  def matrix_string_to_matrix_array
+    @points.split("\n").map { |string| string.split(" ").map(&:to_i) }
+  end
+
 end
