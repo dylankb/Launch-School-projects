@@ -1,15 +1,15 @@
 class Matrix
 
   def initialize(points)
-    @points = points
+    @data_points = matrix_string_to_matrix_array(points)
   end
 
   def rows
-    matrix_string_to_matrix_array
+    @data_points
   end
 
   def columns
-    matrix_string_to_matrix_array.transpose
+    @data_points.transpose
   end
 
   def saddle_points
@@ -23,8 +23,8 @@ class Matrix
 
   private
 
-  def matrix_string_to_matrix_array
-    @points.split("\n").map { |string| string.split(" ").map(&:to_i) }
+  def matrix_string_to_matrix_array(points)
+    points.split("\n").map { |string| string.split(" ").map(&:to_i) }
   end
 
 end
