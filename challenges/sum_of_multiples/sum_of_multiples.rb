@@ -9,11 +9,11 @@ class SumOfMultiples
   end
 
   def find_multiples_in(range)
-    range.each_with_object([]) do |number, acc|
-      acc << number if @factors.any? { |factor| number % factor == 0 }
+    range.select do |number|
+      @factors.any? { |factor| number % factor == 0 }
     end
   end
-  
+
   def to(limit)
     range = (0..limit - 1)
     multiples = find_multiples_in(range)
