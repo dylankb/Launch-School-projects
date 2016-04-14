@@ -1,27 +1,21 @@
-require 'pry'
-
 class SumOfMultiples
 
-  def self.to(limit)
-    (0..limit - 1).select {|number| number % 3 == 0 || number % 5 == 0}.reduce(&:+)
+  def initialize(*factors)
+    @factors = factors
   end
 
-  def initialize(*multiples)
-    @multiples = multiples
+  def self.to(limit)
+    new(3,5).to(limit)
   end
 
   def find_multiples_in(range)
-    results = []
-    @multiples.each do |multiple|
-      range.each do |number|
-        results << number if number % multiple == 0
-      end
+    range.each_with_object([]) do |number, acc|
+      acc << number if @factors.any? { |factor| number % factor == 0 }
     end
-    results
   end
-
+  
   def to(limit)
-    range = ((0..limit).to_a)[0..-2]
+    range = (0..limit - 1)
     multiples = find_multiples_in(range)
     multiples.uniq.inject(:+)
   end
