@@ -5,7 +5,7 @@ class Trinary
   end
 
   def valid_number?
-    return true unless @string =~ /\D/
+    return true unless @string =~ /[^012]/
   end
 
   def format_number
@@ -17,3 +17,5 @@ class Trinary
     format_number.map.with_index { |num, index| num * (3 ** index) }.inject(:+)
   end
 end
+
+puts Trinary.new("0123").to_decimal
