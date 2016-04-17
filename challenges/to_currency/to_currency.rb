@@ -8,10 +8,10 @@ def to_currency(number_string)
                          .map do |interval|
                             interval.reverse.join 
                           end
-                          .reverse
-                          .join(',')
+                         .reverse
+                         .join(',')
 
-  cents = sprintf("%.2f", number_string).scan(/\.\d+/)[0]
+  cents = sprintf("%.2f", number_string).scan(/\.\d/)[0]
 
   "$" + dollars + cents
 end
