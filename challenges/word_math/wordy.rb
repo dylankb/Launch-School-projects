@@ -3,8 +3,7 @@ class WordProblem
   def initialize(word_problem)
     @operands = get_operands(word_problem)
     @operators = get_operators(word_problem)
-    raise "Missing operator(s)" unless @operators.size >= 1
-    raise "Insufficient parameters" unless @operands.size >= 2
+    raise ArgumentError if @operators.empty? || @operands.empty?
   end
 
   def minus
