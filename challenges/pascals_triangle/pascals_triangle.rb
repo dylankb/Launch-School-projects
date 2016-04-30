@@ -14,15 +14,15 @@ end
 
 private 
 
-  def create_row(row)
-    row.each_with_object([]).with_index do |(value, obj), index|
-      if index == 0
-        obj << 1
-        row.size > 1 ? obj << value + row[index + 1] : obj << 1
-      elsif index == row.size - 1
-        obj << 1
-      else
-        obj << value + row[index + 1]
-      end
+def create_row(row)
+  row.each_with_object([]).with_index do |(value, obj), index|
+    if index == 0
+      obj << 1
+      row.size > 1 ? obj << value + row[index + 1] : obj << 1
+    elsif index == row.size - 1
+      obj << 1
+    else
+      obj << value + row[index + 1]
     end
   end
+end
