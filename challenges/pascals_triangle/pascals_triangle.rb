@@ -16,13 +16,7 @@ private
 
 def create_row(row)
   row.each_with_object([]).with_index do |(value, obj), index|
-    if index == 0
-      obj << 1
-      row.size > 1 ? obj << value + row[index + 1] : obj << 1
-    elsif index == row.size - 1
-      obj << 1
-    else
-      obj << value + row[index + 1]
-    end
-  end
+    return [1,1] if row == [1]
+    index == 0 ? obj << 1 : obj << value + row[index - 1]
+  end.insert(-1,1)
 end
