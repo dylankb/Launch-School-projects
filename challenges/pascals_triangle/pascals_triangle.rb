@@ -1,22 +1,24 @@
 class Triangle
 
-  def initialize(row_number)
-    @row_number = row_number
+  def initialize(levels)
+    @levels = levels
   end
 
   def rows
-    (@row_number - 1).times.with_object([[1]]) do |i, obj|
-      last_row = create_row(obj[i])  
-      obj << last_row
+    (@levels - 1).times.with_object([[1]]) do |i, rows|
+      last_row = create_row(rows[i])  
+      rows << last_row
     end
   end
 end
 
-private 
+private
 
-def create_row(row)
-  row.each_with_object([]).with_index do |(value, obj), index|
-    return [1,1] if row == [1]
-    index == 0 ? obj << 1 : obj << value + row[index - 1]
-  end.insert(-1,1)
+def self.create_row(last_row)
+  new_row = []
+  last_row.each_with_index do |value, index|
+    index == 0 ? new_row << 1 : new_row << (value + last_row[index - 1])
+  end
+  new_row << 1
 end
+
