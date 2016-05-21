@@ -17,21 +17,17 @@ class Crypto
     normalize_plaintext.scan(/.{1,#{size}}/)
   end
 
-  def encode
-    size.times.with_object([]) do |index, result|
-      new_segment = []
-      plaintext_segments.each do |segment|
-        new_segment << segment[index]
-      end
-      result << new_segment.compact.join
-    end
+  def transpose
+    rows = plaintext_segments.map! {|rows| rows.split("")}
+    rows.last << nil until rows.last.size == size
+    rows.transpose.map { |row| row.compact.join }
   end
 
   def ciphertext
-    encode.join
+    transpose.join
   end
 
   def normalize_ciphertext
-    encode.join(" ").strip
+    transpose.join(" ").strip
   end
 end
