@@ -18,15 +18,13 @@ class Crypto
   end
 
   def encode
-    cipher = []
-    size.times do |i|
+    size.times.with_object([]) do |index, result|
       new_segment = []
       plaintext_segments.each do |segment|
-        new_segment << segment[i]
+        new_segment << segment[index]
       end
-      cipher << new_segment.compact.join
+      result << new_segment.compact.join
     end
-    cipher
   end
 
   def ciphertext
