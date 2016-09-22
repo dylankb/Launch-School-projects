@@ -8,8 +8,13 @@
 
 
 ```sql
-SELECT title, date_part('year',current_date) AS today,
-        date_part('year',current_date) - year AS age
+SELECT title, date_part('year', current_date) - year AS age
 FROM films
 ORDER BY age;
+```
+
+```sql
+SELECT title, extract(year from current_date) - year AS age
+FROM films
+ORDER BY age ASC;
 ```
