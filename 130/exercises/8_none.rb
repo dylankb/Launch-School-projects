@@ -3,15 +3,21 @@
 #   true
 # end
 
-def all?(collection)
+def any?(collection)
   collection.each { |ele| return false unless yield(ele) }
   true
 end
 
+def none?(collection, &block)
+  !any?(collection, &block)
+end
+
+
+
 # var = none?([1, 3, 5, 6]) { |value| value.even? } == false
 # p var
 bar = none?([2, 4, 6, 8]) do |value|
-  value.even? == true
+  value.odd? == true
 end
 puts bar
 none?([2, 4, 6, 8]) { |value| value.odd? } == true
