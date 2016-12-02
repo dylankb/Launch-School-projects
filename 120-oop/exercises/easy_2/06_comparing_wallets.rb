@@ -9,9 +9,9 @@ class Wallet
     amount <=> other_wallet.amount
   end
 
-  # protected    Fix the broken code by making amount accessible to Wallet objects
-  #              A private method would not have worked.
-  # attr_reader :amount
+  protected    # A private method would not have worked.
+
+  attr_reader :amount
 end
 
 bills_wallet = Wallet.new(500)
