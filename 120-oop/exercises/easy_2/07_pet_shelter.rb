@@ -7,7 +7,6 @@ class Pet
   end
 
   def add_to_shelter(shelter)
-    # require 'pry'; binding.pry
     shelter.add_to_shelter(self)
   end
 end
@@ -64,15 +63,12 @@ class Shelter
   def print_available_pets
     puts "Here are the available pets"
     @to_adopt.each do |pet, available|
-      # require 'pry'; binding.pry
       if available
         puts "a #{pet.type} called #{pet.name}"
       end
     end
   end
 end
-
-
 
 phanson = Owner.new('P Hanson')
 bholmes = Owner.new('B Holmes')
