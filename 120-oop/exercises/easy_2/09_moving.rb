@@ -46,6 +46,27 @@ class Cheetah
   end
 end
 
+class Noble
+  include Walkability
+  attr_reader :title
+
+  def initialize(name, title)
+    @name = name
+    @title = title
+  end
+
+  def name
+    "#{title} #{@name}"
+  end
+
+  private
+
+  def gait
+    "strolls"
+  end
+
+end
+
 mike = Person.new("Mike")
 mike.walk
 # => "Mike strolls forward"
@@ -57,3 +78,6 @@ kitty.walk
 flash = Cheetah.new("Flash")
 flash.walk
 # => "Flash runs forward"
+
+byron = Noble.new("Byron", "Lord")
+p byron.walk
