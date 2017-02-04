@@ -8,9 +8,13 @@ class Machine
     flip_switch(:off)
   end
 
+  def settings
+    switch
+  end
+
   private
 
-  attr_writer :switch
+  attr_accessor :switch
 
   def flip_switch(desired_state)
     self.switch = desired_state
@@ -19,3 +23,6 @@ class Machine
 end
 
 puts Machine.new().flip_switch(:on)  # fails
+
+zorb.start
+zorb.settings # > :on
