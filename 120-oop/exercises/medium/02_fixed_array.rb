@@ -1,25 +1,25 @@
 class FixedArray < Array
-  attr_reader :array
 
   def initialize(size)
     @size = size
-    @array = [nil] * size
+    @array = Array.new(size)
   end
 
-  def [](element)
-    array.fetch(element)
+  def [](index)
+    @array.fetch(index)
   end
 
   def to_a
-    array
+    @array.clone
   end
 
   def to_s
-    array.to_s
+    to_a.to_s
   end
 
   def []=(index, value)
-    array[index] = value
+    @array.fetch(index)
+    @array[index] = value
   end
 end
 
@@ -62,3 +62,8 @@ begin
 rescue IndexError
   puts true
 end
+
+fa = FixedArray.new(50)
+a = fa.to_a
+a.delete_at(0)
+p a.length
