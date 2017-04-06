@@ -1,7 +1,9 @@
-# 1. A cell by itself dies of starvation
-# 2. 2 or 3 neighbors - lives to next generation
-# 3. 3 live cells - lives to next generation
-# 4. A cell with three or more neighbors dies of overcrowding
+# 1. Live cell by itself - dies of starvation
+# 2. Live cell with less than two living neighbors - dies by starvation
+# 2. Live cell with 2 or 3 neighbors - lives to next generation
+# 3. Live cell with more than 3 living neighbors - dies by overcrowding
+# 4. Dead cell with 3 living neighbors - comes back to life
+require 'pry'
 
 class World
   attr_reader :board
@@ -20,7 +22,7 @@ class World
   end
 
   def alive_at?(location)
-    @board[location].state == :alive
+    @board[location].alive? == true
   end
 
   def reset_squares
@@ -35,38 +37,44 @@ class World
     end
   end
 
-  def neighbors_alive_in_next_generation(location)
-    location.neighbors.select do |neighbor|
-      cell = find_cell_by_coordinates(neighbor)
-      cell ? cell.state == :alive : nil
+  def find_cell(location)
+    @board[location]
+  end
+
+  def find_neighbor_cell_by_a_location(location)
+    neighbor_location = @board.keys.find do |neighbor_location|
+      (location.x == neighbor_location.x) && (location.y == neighbor_location.y)
     end
+
+    @board[neighbor_location]
+  end
+
+  def stable_environment?(location, neighbors_alive_count)
+    neighbors_alive_count == 2 || neighbors_alive_count == 3
+  end
+
+  def regeneration_environment?(location, neighbors_alive_count)
+    neighbors_alive_count == 3
   end
 
   def alive_in_next_generation?(location)
-    neighbors_alive = neighbors_alive_in_next_generation(location)
+    neighbors_alive_count = neighbors_alive_in_next_generation(location).count
+    cell = find_cell(location)
 
-    if find_cell(location).state == :alive
-      if neighbors_alive.count < 2 || neighbors_alive > 3
-        return false
-      end
+    if cell.alive?
+      return stable_environment?(location, neighbors_alive_count)
     else
-      if neighbors_alive.count != 3
-        return false
-      end
+      return regeneration_environment?(location, neighbors_alive_count)
     end
 
-    true
+    false
   end
 
-  def find_cell_by_coordinates(neighbor)
-    cell = @board.find do |location|
-      (neighbor.x == location[0].x) && (neighbor.y == location[0].y)
+  def neighbors_alive_in_next_generation(location)
+    location.neighbor_locations.select do |neighbor_location|
+      cell = find_neighbor_cell_by_a_location(neighbor_location)
+      cell ? cell.alive? == true : false
     end
-    cell ? cell[1] : nil
-  end
-
-  def find_cell(location)
-    @board[location]
   end
 end
 
@@ -79,7 +87,8 @@ class Location
     # raise "Duplicate location" unless unique_location?
   end
 
-  def neighbors
+  def neighbor_locations
+    # Do this in a nested loop
     [ Location.new(x+1, y+1),
       Location.new(x+1, y),
       Location.new(x+1, y-1),
@@ -93,26 +102,50 @@ class Location
 end
 
 class Cell
-  attr_reader :state
+  attr_reader :alive
 
   def initialize(location)
-    @state = :alive
+    @alive = true
     @location = location
   end
 
-  def alive_in_next_generation?
-    @location.neighbors
+  def alive?
+    @alive
   end
 end
 
 world = World.new
 world.set_up
 
+# IMPROVEMENTS
 
-
-# Improvements
-# -
 # class World
 # def set_living_at(location)
 # #...
 # end end
+
+# 2) It's odd that I need a find_neighbor_cell_by_a_location(neighbor_location), but
+# not sure a way around it
+
+# - Location knowing about board and the ACTUAL neighbors might help...
+
+# 3) Cell should know if it's alive in next generation?
+# Current the world does because it requires @board knowledge, but that would require location
+
+# IDEAS
+# 1. Location knows about board
+# create_cell(Location.new(x, y, @board))
+
+# 2. Cell knows location
+# find_cell_location
+#    @location
+#  end
+
+# def initialize(location)
+#   ...
+#   @location = location
+# end
+
+# QUESTIONS
+
+# 1. Is it better to have a hash of locations with cell values, than having an array of Cells with location ivars that hold a Location class?
