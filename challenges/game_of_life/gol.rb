@@ -32,7 +32,7 @@ class World
   def set_up
     3.times do |x|
       3.times do |y|
-        create_cell(Location.new(x, y))
+        create_cell(Location.new(x, y, @board))
       end
     end
   end
@@ -40,64 +40,38 @@ class World
   def find_cell(location)
     @board[location]
   end
-
-  def find_neighbor_cell_by_a_location(location)
-    neighbor_location = @board.keys.find do |neighbor_location|
-      (location.x == neighbor_location.x) && (location.y == neighbor_location.y)
-    end
-
-    @board[neighbor_location]
-  end
-
-  def stable_environment?(location, neighbors_alive_count)
-    neighbors_alive_count == 2 || neighbors_alive_count == 3
-  end
-
-  def regeneration_environment?(location, neighbors_alive_count)
-    neighbors_alive_count == 3
-  end
-
-  def alive_in_next_generation?(location)
-    neighbors_alive_count = neighbors_alive_in_next_generation(location).count
-    cell = find_cell(location)
-
-    if cell.alive?
-      return stable_environment?(location, neighbors_alive_count)
-    else
-      return regeneration_environment?(location, neighbors_alive_count)
-    end
-
-    false
-  end
-
-  def neighbors_alive_in_next_generation(location)
-    location.neighbor_locations.select do |neighbor_location|
-      cell = find_neighbor_cell_by_a_location(neighbor_location)
-      cell ? cell.alive? == true : false
-    end
-  end
 end
 
 class Location
   attr_reader :x, :y
 
-  def initialize(x, y)
+  def initialize(x, y, board)
     @x = x
     @y = y
+    @board = board
     # raise "Duplicate location" unless unique_location?
   end
 
+  # This method could/should return actual cells eventually
   def neighbor_locations
     # Do this in a nested loop
-    [ Location.new(x+1, y+1),
-      Location.new(x+1, y),
-      Location.new(x+1, y-1),
-      Location.new(x, y+1),
-      Location.new(x, y-1),
-      Location.new(x-1, y+1),
-      Location.new(x-1, y),
-      Location.new(x-1, y-1),
+    [ Location.new(x+1, y+1, @board),
+      Location.new(x+1, y, @board),
+      Location.new(x+1, y-1, @board),
+      Location.new(x, y+1, @board),
+      Location.new(x, y-1, @board),
+      Location.new(x-1, y+1, @board),
+      Location.new(x-1, y, @board),
+      Location.new(x-1, y-1, @board),
     ]
+  end
+
+  def find_cell_by_location(location)
+    neighbor_location = @board.keys.find do |neighbor_location|
+      (location.x == neighbor_location.x) && (location.y == neighbor_location.y)
+    end
+
+    @board[neighbor_location]
   end
 end
 
@@ -111,6 +85,33 @@ class Cell
 
   def alive?
     @alive
+  end
+
+  def stable_environment?(neighbors_alive_count)
+    neighbors_alive_count == 2 || neighbors_alive_count == 3
+  end
+
+  def regeneration_environment?(neighbors_alive_count)
+    neighbors_alive_count == 3
+  end
+
+  def alive_in_next_generation?
+    neighbors_alive_count = neighbors_currently_alive.count
+
+    if alive?
+      return stable_environment?(neighbors_alive_count)
+    else
+      return regeneration_environment?(neighbors_alive_count)
+    end
+
+    false
+  end
+
+  def neighbors_currently_alive
+    @location.neighbor_locations.select do |neighbor_location|
+      neighbor = @location.find_cell_by_location(neighbor_location)
+      neighbor ? neighbor.alive? == true : false
+    end
   end
 end
 
