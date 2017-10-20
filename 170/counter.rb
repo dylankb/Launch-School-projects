@@ -1,6 +1,8 @@
+# Demonstrates how carefully crafting URLs and their parameters
+# to maintain state from one request to another
 require 'socket'
 
-def url_parser(request_line)  
+def url_parser(request_line)
   http_method, path_and_param, http = request_line.split(' ')
   path, params = path_and_param.split('?')
   params = ( params || "").split('&').each_with_object({}) do |pair, hash|
