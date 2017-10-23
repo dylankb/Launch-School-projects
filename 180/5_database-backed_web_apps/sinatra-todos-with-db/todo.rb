@@ -1,13 +1,20 @@
 require "sinatra"
-require "sinatra/reloader"
+
 require "sinatra/content_for"
 require "tilt/erubis"
 require "pry"
 
+require_relative "database_persistence"
+
 configure do
   enable :sessions
   set :session_secret, 'secret'
-  set :erb, :escape_html => true
+  set :erb, escape_html: true
+end
+
+configure(:development) do
+  require "sinatra/reloader"
+  also_reload "database_persistence.rb"
 end
 
 helpers do
@@ -28,88 +35,22 @@ helpers do
   end
 
   def sort_lists(lists, &block)
-    complete_lists, incomplete_lists = lists.partition { |list| list_complete?(list) }
+    complete_lists, incomplete_lists = lists.partition do |list|
+      list_complete?(list)
+    end
 
     incomplete_lists.each(&block)
     complete_lists.each(&block)
   end
 
   def sort_todos(todos, &block)
-    complete_todos, incomplete_todos = todos.partition { |todo| todo[:completed] }
+    complete_todos, incomplete_todos = todos.partition do |todo|
+      todo[:completed]
+    end
 
     incomplete_todos.each(&block)
     complete_todos.each(&block)
   end
-end
-
-class SessionPersistence
-
-  def initialize(session)
-    @session = session
-    @session[:lists] ||= []
-  end
-
-  def all_lists
-    @session[:lists]
-  end
-
-  def create_new_list(list_name)
-    id = next_element_id(@session[:lists])
-    @session[:lists] << { id: id, name: list_name, todos: [] }
-  end
-
-  def create_new_todo(id, todo_name)
-    list = find_list(id)
-    id = next_element_id(list[:todos])
-    list[:todos] << { id: id, name: todo_name, completed: false }
-  end
-
-  def delete_list(id)
-    @session[:lists].reject! { |list| list[:id] == id }
-  end
-
-  def delete_todo_from_list(list_id, todo_id)
-    list = find_list(list_id)
-    list[:todos].reject! { |todo| todo[:id] == todo_id }
-  end
-
-  def mark_all_complete(id)
-    list =find_list(id)
-    list[:todos].each do |todo|
-      todo[:completed] = true
-    end
-  end
-
-  def find_list(id)
-    @session[:lists].find { |list| list[:id] == id }
-  end
-
-  def toggle_todo_status(list_id, todo_id, is_completed)
-    list = find_list(list_id)
-    todo = list[:todos].find { |t| t[:id] == todo_id } # use t in block to avoid shadowing (but wouldn't be a problem here since it's reassignment)
-    todo[:completed] = is_completed
-  end
-
-  def update_list_name(id, name)
-    list = find_list(id)
-    list[:name] = name
-  end
-
-  private
-
-  def next_element_id(elements)
-    max = elements.map { |todo| todo[:id] }.max || 0
-    max + 1
-  end
-end
-
-def load_list(id)
-  list = @storage.find_list(id)
-  return list if list
-
-  session[:error] = "The specified list was not found."
-  redirect "/lists"
-  halt
 end
 
 # Return an error message if the name is invalid. Return nil if name is valid.
@@ -128,8 +69,17 @@ def error_for_todo(name)
   end
 end
 
+def load_list(id)
+  list = @storage.find_list(id)
+  return list if list
+
+  session[:error] = "The specified list was not found."
+  redirect "/lists"
+  halt
+end
+
 before do
-  @storage = SessionPersistence.new(session)
+  @storage = DatabasePersistence.new(logger)
 end
 
 get "/" do
@@ -226,10 +176,9 @@ end
 # Delete a todo from a list
 post "/lists/:list_id/todos/:id/destroy" do
   @list_id = params[:list_id].to_i
-  @list = load_list(@list_id) # can delete this?
 
   todo_id = params[:id].to_i
-  @storage.delete_todo_from_list(@list_id, todo_id)
+  @storage.delete_todo_from_list(todo_id)
 
   if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
     status 204
@@ -245,9 +194,8 @@ post "/lists/:list_id/todos/:id" do
   @list = load_list(@list_id)
 
   todo_id = params[:id].to_i
-  is_completed = params[:completed] == "true"
 
-  @storage.toggle_todo_status(@list_id, todo_id, is_completed)
+  @storage.toggle_todo_status(@list_id, todo_id)
 
   session[:success] = "The todo has been updated."
   redirect "/lists/#{@list_id}"
