@@ -29,3 +29,9 @@ ALTER TABLE films ADD CONSTRAINT director_name_check
          CHECK ((length(director)> 2)
            AND position(' ' in director) > 0);
 ```
+
+16) List three ways to use the schema to restrict what values can be stored in a column.
+
+1. Data type (which can include a length limitation)
+2. `NOT NULL` Constraint
+3. Check Constraint

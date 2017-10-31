@@ -1,28 +1,53 @@
 1. Create a table with name age	occupation columns.
 
-`CREATE TABLE people (name varchar(255), age integer, occupation varchar(255));`
-
-2. Write SQL statements to insert the data shown in #1 into the table.
-
-`INSERT INTO people (name, age, occupation) VALUES ('Abby', 34, 'biologist');`
-
-3.
-
-4. Write a table for these columns name	length	wingspan	family	extinct
-
 ```sql
-CREATE TABLE birds (name varchar(255), length numeric(4,1), wingspan numeric(4,1), family varchar(255), extinct boolean);
-
-CREATE TABLE birds (
-    name character varying(255),
-    length numeric(4,1),
-    wingspan numeric(4,1), /* or decimal */
-    family text,
-    extinct boolean
+CREATE TABLE people (
+  name varchar(255),
+  age integer,
+  occupation varchar(255)
 );
 ```
 
-5)
+2. Write SQL statements to insert the data shown in #1 into the table.
+
+```sql
+INSERT INTO people (name, age, occupation) VALUES ('Abby', 34, 'biologist');
+INSERT INTO people (name, age) VALUES ('Mu''nisah', 26);
+INSERT INTO people (name, age, occupation) VALUES ('Mirabelle', 40, 'contractor');
+```
+
+3. Write 3 SQL queries that can be used to retrieve the second row of the table shown in #1 and #2.
+
+```sql
+SELECT * FROM people WHERE age = 26;
+SELECT * FROM people WHERE name = 'Mu''nisah';
+SELECT * FROM people WHERE occupation IS NULL;
+SELECT * FROM people ORDER BY occupation DESC;
+```
+
+4. Write a table for these columns: name,	length,	wingspan,	family,	extinct.
+
+```sql
+CREATE TABLE birds (
+  name varchar(255), /* character varying */
+  length numeric(4,1),
+  wingspan numeric(4,1),
+  family varchar(255),
+  extinct boolean
+);
+```
+
+5) Insert data
+
+```sql
+INSERT INTO birds VALUES ('Spotted Towhee', 21.6, 26.7, 'Emberizidae', false);
+INSERT INTO birds VALUES ('American Robin', 25.5, 36.0, 'Turdidae', false);
+INSERT INTO birds VALUES ('Greater Koa Finch', 19.0, 24.0, 'Fringillidae', true);
+INSERT INTO birds VALUES ('Carolina Parakeet', 33.0, 55.8, 'Psittacidae', true);
+INSERT INTO birds VALUES ('Common Kestrel', 35.5, 73.5, 'Falconidae', false);
+```
+
+6)
 
 ```sql
 SELECT name, family
@@ -31,16 +56,10 @@ WHERE extinct=false  /* Or IS false */
 ORDER BY length DESC;
 ```
 
-6) Find average, min and max of wingspan.
-
-`SELECT round(avg(wingspan), 1), min(wingspan), max(wingspan) FROM birds;`
-
-7)
+7) Find average, min and max of wingspan.
 
 ```sql
-CREATE table menu (
-
-)
+SELECT round(avg(wingspan), 1), min(wingspan), max(wingspan) FROM birds;
 ```
 
 8)

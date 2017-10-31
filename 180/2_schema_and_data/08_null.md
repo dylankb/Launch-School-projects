@@ -56,6 +56,4 @@ ALTER TABLE temperatures RENAME TO weather;
 
 10) How would you export the data and structure of the table
 
-```sql
-pg_dump -d sql-course -t weather --inserts > dump.sql
-```
+`pg_dump -d sql-course -t weather --inserts > dump.sql`

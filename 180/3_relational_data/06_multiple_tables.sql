@@ -71,9 +71,11 @@ SELECT users.id, users.username, users_books.user_id
 
     SELECT events.name, COUNT(tickets.id)
       FROM events
-INNER JOIN tickets ON (tickets.event_id = events.id)
-  GROUP BY events.id
-  ORDER BY count DESC;
+           INNER JOIN tickets ON (tickets.event_id = events.id) /* Left join better */
+     GROUP BY events.id
+     ORDER BY count DESC;
+
+/* This works, but if it we there had been any events WITHOUT any ticket sales, they wouldn't have shown
 
 /*)
    Test - Sample data on "checkouts" data
@@ -118,11 +120,10 @@ INNER JOIN users_books ON (users_books.user_id = users.id)
 /*
   6) Write a query that returns the user id, email address, and number of events for all customers that have purchased tickets to three events.
 */
-    SELECT customers.id, customers.email, COUNT(DISTINCT tickets.event_id) /* Prevent counting customers attending same event multiple times */
-      FROM customers
-INNER JOIN tickets ON (tickets.customer_id = customers.id)
+SELECT customers.id, customers.email, COUNT(DISTINCT tickets.event_id) /* Prevent counting customers attending same event multiple times */
+  FROM customers INNER JOIN tickets ON (tickets.customer_id = customers.id)
   GROUP BY customers.id
-    HAVING COUNT(DISTINCT tickets.event_id) = 3;
+  HAVING COUNT(DISTINCT tickets.event_id) = 3;
 
 /*
   This also works, it just returns the events as well and provides a count of those ids.
