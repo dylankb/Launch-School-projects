@@ -2,8 +2,10 @@ class CategoriesController < ApplicationController
   def new
     @category = Category.new
   end
+
   def create
-    @category = Category.new(category_params)
+    @post = Post.find(params[:post_id])
+    @category = @post.categories.new(category_params)
 
     if @category.save
       flash[:notice] = "New category created"

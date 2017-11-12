@@ -3,9 +3,28 @@
 </p>
 
 <%= render @post.categories %>
-
 <%= render 'shared/content_title', title: @post.title %>
 
 <p><%= @post.url %></p>
-
 <p><%= @post.description %></p>
+<hr/>
+<%= form_for [@post, @comment] do |f| %>
+  <% if @comment.errors.any? %>
+    <%= render 'shared/errors', form_object: @comment %>
+  <% end %>
+  <div class="control-group">
+    <%= f.label(:body, "Leave a comment") %>
+    <%= f.text_area :body, rows: 4, class: 'span4' %>
+  </div>
+  <%= f.submit "Comment", class: "btn btn-info" %>
+<% end %>
+<hr/>
+
+<p>Comments:</p>
+<% @post.comments.each do |comment| %>
+  <div class="well span8">
+    "<%= comment.body %>"
+    <p>
+      <span class="quiet">by <%= link_to comment.commenter.username, '' %></span> <small>at <%= comment.created_at %></small>
+  </div>
+<% end %>
