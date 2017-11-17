@@ -1,6 +1,8 @@
-<p class="pull-right">
-  [<%= link_to 'Edit this post', edit_post_path(@post) %>]
-</p>
+<% if logged_in? %>
+  <p class="pull-right">
+    [<%= link_to 'Edit this post', edit_post_path(@post) %>]
+  </p>
+<% end %>
 
 <%= render @post.categories %>
 <%= render 'shared/content_title', title: @post.title %>
@@ -8,17 +10,19 @@
 <p><%= @post.url %></p>
 <p><%= @post.description %></p>
 <hr/>
-<%= form_for [@post, @comment] do |f| %>
-  <% if @comment.errors.any? %>
-    <%= render 'shared/errors', form_object: @comment %>
+<% if logged_in? %>
+  <%= form_for [@post, @comment] do |f| %>
+    <% if @comment.errors.any? %>
+      <%= render 'shared/errors', form_object: @comment %>
+    <% end %>
+    <div class="control-group">
+      <%= f.label(:body, "Leave a comment") %>
+      <%= f.text_area :body, rows: 4, class: 'span4' %>
+    </div>
+    <%= f.submit "Comment", class: "btn btn-info" %>
+    <hr/>
   <% end %>
-  <div class="control-group">
-    <%= f.label(:body, "Leave a comment") %>
-    <%= f.text_area :body, rows: 4, class: 'span4' %>
-  </div>
-  <%= f.submit "Comment", class: "btn btn-info" %>
 <% end %>
-<hr/>
 
 <p>Comments:</p>
 <% @post.comments.each do |comment| %>

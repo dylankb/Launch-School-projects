@@ -1,8 +1,10 @@
 class CommentsController < ApplicationController
+  before_action :require_user
+
   def create
     @post = Post.find(params[:post_id])
     @comment = @post.comments.new(comment_params)
-    @comment.commenter = User.first # TODO: Fix this with authentication
+    @comment.commenter = current_user
 
     if @comment.save
       flash[:notice] = "Comment created"
