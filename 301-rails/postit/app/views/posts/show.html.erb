@@ -26,9 +26,5 @@
 
 <p>Comments:</p>
 <% @post.comments.each do |comment| %>
-  <div class="well span8">
-    "<%= comment.body %>"
-    <p>
-      <span class="quiet">by <%= link_to comment.commenter.username, '' %></span> <small>at <%= format_date(comment.created_at) %></small>
-  </div>
+  <%= render 'comments/comment', comment: comment %>
 <% end %>
