@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_action :set_post, only: [:show, :edit, :update]
+  before_action :set_post, only: [:show, :edit, :update, :vote]
   before_action :require_user, except: [:show, :index]
 
   def index
@@ -36,6 +36,17 @@ class PostsController < ApplicationController
       redirect_to post_path(@post)
     else
       render :edit
+    end
+  end
+
+  def vote
+    @vote = Vote.new(voter: current_user, voteable: @post, vote: params[:vote])
+    if @vote.save
+      flash[:notice] = "Your vote was tallied"
+      redirect_to :back
+    else
+      @posts = Post.all
+      render :index
     end
   end
 
