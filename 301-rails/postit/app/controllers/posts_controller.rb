@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   before_action :set_post, only: [:show, :edit, :update, :vote]
-  before_action :require_user, except: [:show, :index]
+  before_action :require_user, except: [:show, :index, :vote]
 
   def index
     @posts = Post.all
@@ -43,11 +43,11 @@ class PostsController < ApplicationController
     @vote = Vote.new(voter: current_user, voteable: @post, vote: params[:vote])
     if @vote.save
       flash[:notice] = "Your vote was tallied"
-      redirect_to :back
     else
-      @posts = Post.all
-      render :index
+      # Not a model backed form, so just using flash message
+      flash[:error] = "You can only vote once"
     end
+    redirect_to :back
   end
 
   private

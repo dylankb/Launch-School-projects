@@ -10,7 +10,12 @@ PostitTemplate::Application.routes.draw do
   resources :sessions
 
   resources :posts, except: :destroy do
-    resources :comments, only: :create
+    resources :comments, only: :create do
+      member do
+        post :vote
+      end
+    end
+
     resources :categories, only: :create
 
     member do
