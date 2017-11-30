@@ -1,0 +1,11 @@
+#! /usr/bin/env ruby
+require 'json'
+require_relative 'customer_proximity'
+
+office_coordinates = { "latitude" => 53.3381985, "longitude" => -6.2592576 }
+customer_data_from_file = File.open("customers.json", "r") do |file|
+  JSON.parse(file.read)
+end
+
+customers = CustomerProximity.new(customer_data_from_file, office_coordinates)
+customers.within_kilometers(100)
