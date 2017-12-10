@@ -3,7 +3,6 @@ require "minitest/reporters"
 Minitest::Reporters.use!
 require 'simplecov'
 SimpleCov.start
-require 'pry'
 
 require_relative 'todo-list'
 
@@ -166,4 +165,3 @@ class TodoListTest < MiniTest::Test
   end
 
 end
-

@@ -6,7 +6,7 @@ class FixedArray < Array
   end
 
   def [](index)
-    @array.fetch(index)
+    @array.fetch(index) # allows you to raise IndexError if no index
   end
 
   def to_a

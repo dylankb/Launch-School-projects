@@ -161,7 +161,7 @@ class TodoList
     #     todo.done!
     #   end
     # end
-    find_by_title(task_name).done! #&& find_by_title(title).done!
+    find_by_title(task_name).done!
   end
 
   def mark_all_done
