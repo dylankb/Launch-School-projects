@@ -40,14 +40,20 @@ class PostsController < ApplicationController
   end
 
   def vote
-    @vote = Vote.new(voter: current_user, voteable: @post, vote: params[:vote])
-    if @vote.save
+    vote = Vote.create(voter: current_user, voteable: @post, vote: params[:vote])
+
+    if vote.valid?
       flash[:notice] = "Your vote was tallied"
     else
-      # Not a model backed form, so just using flash message
       flash[:error] = "You can only vote once"
     end
-    redirect_to :back
+
+    respond_to do |format|
+      format.html do
+        redirect_to :back
+      end
+      format.js
+    end
   end
 
   private
