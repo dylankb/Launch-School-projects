@@ -20,4 +20,16 @@ class Post < ActiveRecord::Base
   def downvotes
     votes.where(vote: false).size
   end
+
+  before_save :generate_slug
+
+  def to_param
+    slug
+  end
+
+  private
+
+  def generate_slug
+    self.slug = title.tr(' ', '-').downcase
+  end
 end
