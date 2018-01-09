@@ -1,5 +1,5 @@
 # Ex. 4
-Generate a random 8 digit hexadecimal
+# Generate a random 8 digit hexadecimal
 def generate_uuid(sections=5)
   uuid = []
   charset = %w{0 1 2 3 4 6 7 9 A C D E F G H J K M N O P Q R T V W X Y Z}
