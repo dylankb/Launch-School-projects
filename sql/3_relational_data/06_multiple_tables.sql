@@ -1,9 +1,24 @@
+/* Load this DB https://raw.githubusercontent.com/launchschool/sql_course_data/master/sql-and-relational-databases/relational-data-and-joins/working-with-multiple-tables/theater_full.sql */
+
 /* 2) Write a query that determines how many tickets have been sold.. */
 SELECT COUNT(id) FROM tickets;
 
 /* 3) Write a query that determines how many different customers purchased tickets to at least one event. */
 
 SELECT COUNT(DISTINCT(customer_id)) FROM tickets;
+
+/* Same version but with a join - the one above is more efficient */
+
+SELECT COUNT(DISTINCT(customers.id))
+FROM customers
+INNER JOIN tickets ON (customers.id = tickets.customer_id);
+
+/* However with this approach you could run additional types queries on on the data, such as those relating to tickets. Such as, what events did each of these customers attend? */
+
+SELECT DISTINCT(customers.id), string_agg(tickets.event_id::text, ',')
+FROM customers
+INNER JOIN tickets ON (customers.id = tickets.customer_id)
+GROUP BY customers.id
 
 /* 4) Write a query that determines what percentage of the customers in the database have purchased a ticket to one of the events. */
 
